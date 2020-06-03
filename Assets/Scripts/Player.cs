@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
 		spherePool = new Stack();
 
 		prefabSphereLeg.GetComponent<SphereCollider>().radius = Constants.sphereLegRadius;
-		prefabSphereLeg.GetComponent<Renderer>().sharedMaterial.SetFloat("_Scale", Constants.sphereLegRadius * 2 * Constants.fingerImageScale);
+		prefabSphereLeg.GetComponent<Renderer>().sharedMaterial.SetFloat("_Scale", Constants.sphereLegRadius * 2 * Constants.legSphereImageScale);
 		prefabSphereLeg.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Constants.legsColor);
 
 		legs = new Transform[2];
