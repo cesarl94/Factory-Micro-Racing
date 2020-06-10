@@ -48,7 +48,6 @@ public class Player : MonoBehaviour
 
 	public void updateLegs(List<GameObject> inputPositions)
 	{
-
 		//remove current childrens
 		foreach (Transform leg0Child in legs[0])
 		{
@@ -74,19 +73,20 @@ public class Player : MonoBehaviour
 
 		List<Vector3> spherePositions0 = new List<Vector3>();
 		List<Vector3> spherePositions1 = new List<Vector3>();
+		List<bool> sphereCollisions0 = new List<bool>();
+		List<bool> sphereCollisions1 = new List<bool>();
+		int sphereCollisionsCount0 = 0;
+		int sphereCollisionsCount1 = 0;
 
 		GameObject first = inputPositions[0];
-		Vector3 firstPosition = first.transform.position;
+		Vector3 firstInputPosition = first.transform.position;
+		Vector3 lastInputPosition = firstInputPosition;
 		int i = 0;
-		Vector3 lastPos = firstPosition;
-		List<float> magnitudes = new List<float>();
+		Physics.autoSimulation = false;
 		foreach (GameObject inputPosition in inputPositions)
 		{
-			if (i++ == 0) continue;
-			float mg = Vector3.Magnitude(lastPos - inputPosition.transform.position) / Constants.pixelsPerUnitLegs;
-			if (mg < 0.0001f) continue;
-			magnitudes.Add(mg);
-			Vector3 position = (inputPosition.transform.position - firstPosition) / Constants.pixelsPerUnitLegs;
+			if (i++ == 0 || Vector3.SqrMagnitude(lastInputPosition - inputPosition.transform.position) < 0.000001f) continue;
+			Vector3 position = (inputPosition.transform.position - firstInputPosition) / Constants.pixelsPerUnitLegs;
 			GameObject sphere1 = getSphere();
 
 			sphere1.transform.SetParent(legs[0]);
@@ -102,110 +102,105 @@ public class Player : MonoBehaviour
 			SphereCollider SC1 = legs[0].gameObject.AddComponent<SphereCollider>();
 			SC1.radius = Constants.sphereLegRadius;
 			SC1.center = position;
+			bool sphere1Col = Physics.CheckSphere(sphere1.transform.position, Constants.sphereLegRadius, 1 << 8);
+			sphereCollisionsCount0 += sphere1Col ? 1 : 0;
+			sphereCollisions0.Add(sphere1Col);
 			SphereCollider SC2 = legs[1].gameObject.AddComponent<SphereCollider>();
 			SC2.radius = Constants.sphereLegRadius;
 			SC2.center = position;
+			bool sphere2Col = Physics.CheckSphere(sphere2.transform.position, Constants.sphereLegRadius, 1 << 8);
+			sphereCollisionsCount1 += sphere2Col ? 1 : 0;
+			sphereCollisions1.Add(sphere2Col);
 
-			lastPos = inputPosition.transform.position;
+			lastInputPosition = inputPosition.transform.position;
+			Physics.Simulate(0.016f);
+
 		}
+		Physics.autoSimulation = true;
 
-		List<RaycastHit> hits0 = new List<RaycastHit>();
-		List<RaycastHit> hits1 = new List<RaycastHit>();
-
-		Vector3 previousPos = spherePositions0[0];
-		i = 0;
-		foreach (Vector3 pos in spherePositions0)
+		if (sphereCollisionsCount0 > 0 && sphereCollisionsCount1 > 0)
 		{
-			if (i++ == 0) continue;
-
-			Vector3 dir = pos - previousPos;
-			RaycastHit RC;
-			float mg = magnitudes[i - 1];
-			//if (Physics.SphereCast(previousPos, Constants.sphereLegRadius, dir, out RC, 100f, 1 << 8))
-			if (Physics.Raycast(previousPos, dir, out RC, mg, 1 << 8))
-			{
-				hits0.Add(RC);
-			}
-
-			previousPos = pos;
+			//Está atascado
+			Debug.Log("ESta atascado");
 		}
-
-		previousPos = spherePositions1[0];
-		i = 0;
-		foreach (Vector3 pos in spherePositions1)
+		else if (sphereCollisionsCount0 > 0 || sphereCollisionsCount1 > 0)
 		{
-			if (i++ == 0) continue;
 
-			Vector3 dir = pos - previousPos;
-			RaycastHit RC;
-			float mg = magnitudes[i - 1];
 
-			//if (Physics.SphereCast(previousPos, Constants.sphereLegRadius, dir, out RC, 100f, 1 << 8))
-			if (Physics.Raycast(previousPos, dir, out RC, mg, 1 << 8))
-			{
-				hits1.Add(RC);
-			}
-
-			previousPos = pos;
 		}
-
-
-		if (hits0.Count > 0)
+		else
 		{
-			if (hits0[0].collider.attachedRigidbody == null)
-			{
-				if (Input.GetKey(KeyCode.Space))
-				{
-					//GameObject a0 = new GameObject("a0");
-					//a0.transform.position = legs[0].position + difference;
-					GameObject a1 = new GameObject("a1");
-					a1.transform.position = hits0[0].point;
-					GameObject a2 = new GameObject("a2");
-					a2.transform.position = spherePositions0[spherePositions0.Count - 1];
-					GameObject a3 = new GameObject("a3");
-					a3.transform.position = spherePositions0[0];
-					GameObject a4 = new GameObject("a4");
-					a4.transform.position = legs[0].position;
-					Debug.Log("A");
-				}
-				Vector3 difference = hits0[0].point - spherePositions0[spherePositions0.Count - 1];
-				float differenceLength = difference.magnitude;
-				Vector3 normalizedDifference = difference / differenceLength;
-				legs[0].position += normalizedDifference * (differenceLength + Constants.sphereLegRadius);
-				legs[1].position += normalizedDifference * (differenceLength + Constants.sphereLegRadius);
-				cube.position += difference;
-			}
-
-		}
-		if (hits1.Count > 0)
-		{
-			if (hits1[0].collider.attachedRigidbody == null)
-			{
-				if (Input.GetKey(KeyCode.Space))
-				{
-					//GameObject b0 = new GameObject("b0");
-					//b0.transform.position = legs[1].position + difference;
-					GameObject b1 = new GameObject("b1");
-					b1.transform.position = hits1[0].point;
-					GameObject b2 = new GameObject("b2");
-					b2.transform.position = spherePositions1[spherePositions1.Count - 1];
-					GameObject b3 = new GameObject("b3");
-					b3.transform.position = spherePositions1[0];
-					GameObject b4 = new GameObject("b4");
-					b4.transform.position = legs[1].position;
-					Debug.Log("B");
-				}
-				Vector3 difference = hits1[0].point - spherePositions1[spherePositions1.Count - 1];
-				float differenceLength = difference.magnitude;
-				Vector3 normalizedDifference = difference / differenceLength;
-				legs[0].position += normalizedDifference * (differenceLength + Constants.sphereLegRadius);
-				legs[1].position += normalizedDifference * (differenceLength + Constants.sphereLegRadius);
-				cube.position += difference;
-			}
-
+			Debug.Log("SOLO CAE");
+			//Solo cae
 		}
 
-		//if (Input.GetKey(KeyCode.Space)) Debug.Break();
+		// List<RaycastHit> hits0 = new List<RaycastHit>();
+		// List<RaycastHit> hits1 = new List<RaycastHit>();
+
+		// Vector3 previousPos = spherePositions0[0];
+		// i = 0;
+		// foreach (Vector3 pos in spherePositions0)
+		// {
+		// 	if (i++ == 0) continue;
+
+		// 	Vector3 dir = pos - previousPos;
+		// 	RaycastHit RC;
+		// 	float mg = magnitudes[i - 1];
+		// 	//if (Physics.SphereCast(previousPos, Constants.sphereLegRadius, dir, out RC, 100f, 1 << 8))
+		// 	if (Physics.Raycast(previousPos, dir, out RC, mg, 1 << 8))
+		// 	{
+		// 		hits0.Add(RC);
+		// 	}
+
+		// 	previousPos = pos;
+		// }
+
+		// previousPos = spherePositions1[0];
+		// i = 0;
+		// foreach (Vector3 pos in spherePositions1)
+		// {
+		// 	if (i++ == 0) continue;
+
+		// 	Vector3 dir = pos - previousPos;
+		// 	RaycastHit RC;
+		// 	float mg = magnitudes[i - 1];
+
+		// 	//if (Physics.SphereCast(previousPos, Constants.sphereLegRadius, dir, out RC, 100f, 1 << 8))
+		// 	if (Physics.Raycast(previousPos, dir, out RC, mg, 1 << 8))
+		// 	{
+		// 		hits1.Add(RC);
+		// 	}
+
+		// 	previousPos = pos;
+		// }
+
+
+		// if (hits0.Count > 0)
+		// {
+		// 	if (hits0[0].collider.attachedRigidbody == null)
+		// 	{
+		// 		Vector3 difference = hits0[0].point - spherePositions0[spherePositions0.Count - 1];
+		// 		float differenceLength = difference.magnitude;
+		// 		Vector3 normalizedDifference = difference / differenceLength;
+		// 		legs[0].position += normalizedDifference * (differenceLength + Constants.sphereLegRadius);
+		// 		legs[1].position += normalizedDifference * (differenceLength + Constants.sphereLegRadius);
+		// 		cube.position += difference;
+		// 	}
+
+		// }
+		// if (hits1.Count > 0)
+		// {
+		// 	if (hits1[0].collider.attachedRigidbody == null)
+		// 	{
+		// 		Vector3 difference = hits1[0].point - spherePositions1[spherePositions1.Count - 1];
+		// 		float differenceLength = difference.magnitude;
+		// 		Vector3 normalizedDifference = difference / differenceLength;
+		// 		legs[0].position += normalizedDifference * (differenceLength + Constants.sphereLegRadius);
+		// 		legs[1].position += normalizedDifference * (differenceLength + Constants.sphereLegRadius);
+		// 		cube.position += difference;
+		// 	}
+
+		// }
 	}
 
 
