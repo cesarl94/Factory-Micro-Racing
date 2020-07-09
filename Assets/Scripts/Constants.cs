@@ -13,7 +13,7 @@ public class Constants : MonoBehaviour
 	public static Color legsColor = new Color(0.2745098f, 0.2745098f, 0.2745098f);
 }
 
-export function ruleOfFive(inputDataA: number, outputDataA: number, inputDataB: number, outputDataB: number, input: number, clamp: boolean): number {
-	const t: number = (input - inputDataA) / (inputDataB - inputDataA);
-	return outputDataA + (outputDataB - outputDataA) * (clamp ? Math.min(Math.max(t, 0), 1) : t);
-}
+// export function ruleOfFive(inputDataA: number, outputDataA: number, inputDataB: number, outputDataB: number, input: number, clamp: boolean): number {
+// 	const t: number = (input - inputDataA) / (inputDataB - inputDataA);
+// 	return outputDataA + (outputDataB - outputDataA) * (clamp ? Math.min(Math.max(t, 0), 1) : t);
+// }

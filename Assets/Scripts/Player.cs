@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
 	Stack spherePool;
 	Transform[] legs;
 	Transform cube;
+	Rigidbody[] rbLegs;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -37,14 +38,29 @@ public class Player : MonoBehaviour
 				cube = child;
 			}
 		}
-
+		rbLegs = new Rigidbody[2];
+		rbLegs[0] = legs[0].GetComponent<Rigidbody>();
+		rbLegs[1] = legs[1].GetComponent<Rigidbody>();
 	}
 
-	// Update is called once per frame
-	//void Update()
-	//{
 
-	//}
+	// Update is called once per frame
+	void Update()
+	{
+		foreach (Rigidbody rb in rbLegs)
+		{
+			//Debug.Log("CACA");
+			//rb.AddRelativeTorque(new Vector3(0, 0, Time.deltaTime));
+
+		}
+
+		foreach (Transform leg in legs)
+		{
+			//Debug.Log("CACA");
+			//rb.AddRelativeTorque(new Vector3(0, 0, Time.deltaTime));
+			//leg.Rotate(0f, 0f, Time.deltaTime);
+		}
+	}
 
 	public void updateLegs(List<GameObject> inputPositions)
 	{
