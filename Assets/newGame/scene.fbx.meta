@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 0155c0d86286fc345b3b0de9913c99e4
 ModelImporter:
-  serializedVersion: 19300
+  serializedVersion: 19301
   internalIDToNameTable: []
   externalObjects:
   - first:
@@ -12,8 +12,33 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: BoxFactory
+    second: {fileID: 2100000, guid: 6336af49b5a965b44b0aa3505d8a74d4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: CarTexture
+    second: {fileID: 2100000, guid: 1e03e18ecba82c44ba0d6f79660995c8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Machine
+    second: {fileID: 2100000, guid: 6ceba7c546ea4ac499500f378e459e0d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Office
+    second: {fileID: 2100000, guid: 6d2741426262d3f41af3cf3cf8a7100f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: TrackMaterial
     second: {fileID: 2100000, guid: eff24a055916ec74c8027127a0ec474a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: UnlitCarTexture
+    second: {fileID: 2100000, guid: dd01ddf9060df3247afa3a605cc0ffea, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
@@ -53,6 +78,7 @@ ModelImporter:
     importBlendShapes: 1
     importCameras: 0
     importLights: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
