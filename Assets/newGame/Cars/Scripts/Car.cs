@@ -33,9 +33,6 @@ public class Car : MonoBehaviour
 			this.wheels[i].initialize(i);
 			
 		}
-
-		Debug.Log((Vector2.up + Vector2.right).normalized);
-
 	}
 
     void FixedUpdate() {
@@ -56,10 +53,10 @@ public class Car : MonoBehaviour
 
 		Vector3 frontToRight = (this.wheels[0].getWheelPosition() - frontCenter).normalized;
 		Vector3 backToRight = (this.wheels[1].getWheelPosition() - backCenter).normalized;
-		Vector3 averageRight = (frontToRight - backToRight) / 2f;
+		Vector3 averageRight = (frontToRight - backToRight) / Mathf.Sqrt(2f);
 
 		Vector3 carUp = Vector3.Cross(toFront, averageRight);
-		//this.transform.position = (frontCenter + backCenter) / 2;
+		//this.transform.position = (frontCenter + backCenter) / 2f;
 		this.bodywork.transform.rotation = Quaternion.LookRotation(toFront, carUp);
 
 		Vector3 movements = Vector3.zero;
@@ -68,7 +65,7 @@ public class Car : MonoBehaviour
 			Vector3 wheelPosition = this.wheels[i].getWheelPosition();
 			Vector3 originPosition = this.wheels[i].getWheelOrigin();
 
-			movements += (wheelPosition - originPosition);
+			movements += wheelPosition - originPosition;
 		}
 
 		this.transform.position += movements / 4;
