@@ -15,15 +15,6 @@ public class RearWheelDrive : MonoBehaviour {
 		rb.centerOfMass = Vector3.zero ;	
 	}
 
-	/*
-	scale 0.1
-	mass 100
-	natural frequenci 10 0.8 0.03 
-	30 30
-	mass 2
-	0.4, 2, 0.8, 1, 1
-	0.4, 4, 0.5, 1.5, 1
-	*/
 
 	// this is a really simple approach to updating wheels
 	// here we simulate a rear wheel drive car and assume that the car is perfectly symmetric at local zero
