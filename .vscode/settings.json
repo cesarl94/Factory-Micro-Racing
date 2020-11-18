@@ -52,5 +52,10 @@
         "ProjectSettings/":true,
         "temp/":true,
         "Temp/":true
-    }
+	},
+	"editor.defaultFormatter": "ms-dotnettools.csharp",
+	"editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.insertSpaces": false,
+    "omnisharp.useEditorFormattingSettings": false
 }
