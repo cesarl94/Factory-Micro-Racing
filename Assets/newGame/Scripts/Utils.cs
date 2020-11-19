@@ -16,4 +16,25 @@ public static class Utils
         float t = (input - inputDataA) / (inputDataB - inputDataA);
         return outputDataA + (outputDataB - outputDataA) * (clamp ? Mathf.Min(Mathf.Max(t, 0), 1) : t);
     }
+
+    public static float getInterpolatedValueInVectors(Vector2[] inputOutput, float input)
+    {
+        if (inputOutput.Length == 1)
+        {
+            return inputOutput[0].y;
+        }
+
+        for (int i = 0; i < inputOutput.Length - 1; i++)
+        {
+            Vector2 previous = inputOutput[i];
+            Vector2 next = inputOutput[i + 1];
+
+            if (input >= previous.x && input < next.x)
+            {
+                return Utils.ruleOfFive(previous.x, previous.y, next.x, next.y, input, false);
+            }
+        }
+
+        return inputOutput[inputOutput.Length - 1].y;
+    }
 }

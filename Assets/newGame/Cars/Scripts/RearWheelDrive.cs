@@ -12,19 +12,17 @@ public class RearWheelDrive : MonoBehaviour
 
     private WheelCollider[] wheels;
 
-
-
-    public float maxAngle = 15;
-    public float maxTorque = 300;
-    public float skiddingAngle = 0;
-    private float lastSkiddingAngle = 0;
+    [SerializeField]
+    private Vector2[] relationVelocityTorque;
+    [SerializeField]
+    private Vector2[] relationVelocityMaxAngle;
+    [SerializeField]
+    private Vector2[] relationVelocitySkidding;
 
     private Rigidbody rb;
-
     private Vector3 velocity;
+    private Vector3 forward;
     private Vector3 up;
-    private float returnVelocity;
-    private bool crashRecover;
 
 
     // here we find all the WheelColliders down in the hierarchy
@@ -33,74 +31,35 @@ public class RearWheelDrive : MonoBehaviour
         wheels = GetComponentsInChildren<WheelCollider>();
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = Vector3.zero;
-        crashRecover = false;
 
-    }
-
-    private float getAngle()
-    {
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.D))
+        if (relationVelocityMaxAngle.Length == 0)
         {
-            return maxAngle;
-        }
-        else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.A))
-        {
-            return -maxAngle;
+            Debug.LogError("No hay relación velocidad - angulo en el auto");
+            Debug.Break();
         }
 
-        return 0f;
     }
 
     public void FixedUpdate()
     {
-        float angle = maxAngle * Input.GetAxis("Horizontal");
-        float torque = maxTorque * Input.GetAxis("Vertical");
 
-        skiddingAngle = -angle / 2f;//Mathf.Abs(angle) < maxAngle * 0.5f ? 0 : maxAngle * Mathf.Sign(Input.GetAxis("Horizontal"));
-        transform.RotateAround(transform.up, (skiddingAngle - lastSkiddingAngle) * Mathf.Deg2Rad);
+        float currentVelocity = rb.velocity.magnitude;
 
+        float angle = Utils.getInterpolatedValueInVectors(relationVelocityMaxAngle, currentVelocity) * Input.GetAxis("Horizontal");
+        float torque = Utils.getInterpolatedValueInVectors(relationVelocityTorque, currentVelocity) * Input.GetAxis("Vertical");
 
-        lastSkiddingAngle = skiddingAngle;
+        //skiddingAngle = -angle * Utils.getInterpolatedValueInVectors(relationVelocitySkidding, currentVelocity);
+        //transform.RotateAround(transform.up, (skiddingAngle - lastSkiddingAngle) * Mathf.Deg2Rad);
+        // lastSkiddingAngle = skiddingAngle;
 
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Break();
-        }
-
-        // if(!skidding){
-        // 	if(Mathf.Abs(angle) > maxAngle * 0.3333f){
-        // 		skidding = true;
-        // 		transform.RotateAround(transform.up, maxAngle * 0.3333f * Mathf.Deg2Rad * Mathf.Sign(angle));
-        // 		foreach (WheelCollider wheel in wheels){
-        // 			wheel.transform.RotateAround(transform.up, maxAngle * -0.3333f * Mathf.Deg2Rad * Mathf.Sign(angle));
-        // 		}
-        // 	}
-
-        // 	//if(Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.D)){
-        // 	//}
-        // 	//else if(Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.A)){
-        // 	//	skidding = true;
-
-        // 		//this.transform.RotateAroundLocal(Vector3.up, angle * Mathf.Deg2Rad);
-        // 	//}
-        // }
-        // else{
-        // 	if(Mathf.Abs(angle) < maxAngle * 0.3333f){
-        // 		skidding = false;
-        // 	}
-        // }
 
 
 
         foreach (WheelCollider wheel in wheels)
         {
-            // a simple car where front wheels steer while rear ones drive
-            //if (wheel.transform.localPosition.z > 0)
-            //	wheel.steerAngle = -skiddingAngle + angle;
-            //else 
-            wheel.steerAngle = -skiddingAngle + (wheel.transform.localPosition.z > 0 ? angle : 0f);
-
+            // wheel.steerAngle = -skiddingAngle + (wheel.transform.localPosition.z > 0 ? angle : 0f);
+            if (wheel.transform.localPosition.z > 0)
+                wheel.steerAngle = angle;
 
             if (wheel.transform.localPosition.z < 0)
                 wheel.motorTorque = torque;
@@ -118,22 +77,23 @@ public class RearWheelDrive : MonoBehaviour
 
         velocity = rb.velocity;
         up = rb.transform.up;
+        forward = rb.transform.forward;
     }
+
 
     void OnCollisionEnter(Collision collision)
     {
-        float velocityMagnitude = velocity.magnitude;
-        Vector3 velocityNormalized = velocity / velocityMagnitude;
-
-        float collisionDot = Vector3.Dot(velocityNormalized, collision.contacts[0].normal);
-        float movementFactor = 1 - Mathf.Abs(collisionDot);
-
-        Vector3 reflection = Vector3.Reflect(velocityNormalized, collision.contacts[0].normal);
-        Vector3 newDirection = Vector3.Slerp(velocityNormalized, reflection, 0.3f * movementFactor);
-
-        rb.position += reflection * 0.15f;
-        rb.rotation = Quaternion.LookRotation(newDirection, up);
-        rb.velocity = newDirection * velocityMagnitude * movementFactor;
+        this.transform.RotateAround(up, Input.GetAxis("Vertical") * Input.GetAxis("Horizontal") * 0.02f);
         rb.angularVelocity = Vector3.zero;
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+        OnCollisionEnter(collision);
+    }
+
+    private float getMaxAngle(float velocity)
+    {
+        return Utils.getInterpolatedValueInVectors(relationVelocityMaxAngle, velocity);
     }
 }
