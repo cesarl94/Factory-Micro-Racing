@@ -37,4 +37,15 @@ public static class Utils
 
         return inputOutput[inputOutput.Length - 1].y;
     }
+
+    public static Transform findNode(Transform parent, string name)
+    {
+        Transform findedNode = parent.Find(name);
+        if (findedNode == null)
+        {
+            Debug.LogError("Error: \"" + name + "\" node wasn't finded");
+            Debug.Break();
+        }
+        return findedNode;
+    }
 }
