@@ -101,7 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5351994080863109281}
   - component: {fileID: 5351994080863109280}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Car1WheelFL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -137,7 +137,7 @@ WheelCollider:
     damper: 359.954
     targetPosition: 0.5
   m_SuspensionDistance: 0.19619998
-  m_ForceAppPointDistance: -0.05580911
+  m_ForceAppPointDistance: -0.055808634
   m_Mass: 2
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
@@ -163,7 +163,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5351994080972109902}
   - component: {fileID: 5351994080972109901}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Car1WheelBL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -199,7 +199,7 @@ WheelCollider:
     damper: 440.04575
     targetPosition: 0.5
   m_SuspensionDistance: 0.19620001
-  m_ForceAppPointDistance: -0.05580911
+  m_ForceAppPointDistance: -0.055808634
   m_Mass: 2
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
@@ -347,7 +347,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5351994081188166058}
   - component: {fileID: 5351994081188166057}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Car1WheelFR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -383,7 +383,7 @@ WheelCollider:
     damper: 359.95428
     targetPosition: 0.5
   m_SuspensionDistance: 0.19620003
-  m_ForceAppPointDistance: -0.055812687
+  m_ForceAppPointDistance: -0.05581233
   m_Mass: 2
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
@@ -409,7 +409,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5351994082069914804}
   - component: {fileID: 5351994082069914803}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Car1WheelBR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -445,7 +445,7 @@ WheelCollider:
     damper: 440.046
     targetPosition: 0.5
   m_SuspensionDistance: 0.19620001
-  m_ForceAppPointDistance: -0.05580911
+  m_ForceAppPointDistance: -0.055808872
   m_Mass: 2
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
