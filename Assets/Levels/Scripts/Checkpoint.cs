@@ -2,39 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+#pragma warning disable RCS1222
+#pragma warning disable IDE1006
+#pragma warning disable RCS1018
+#pragma warning disable RCS1213
+#pragma warning disable RCS1110
+#pragma warning disable IDE0051
+
 public class Checkpoint : MonoBehaviour
 {
-    List<Transform> origins;
+    private List<int> checkpointIDs;
 
-    void Start()
+    void Awake()
     {
-        origins = new List<Transform>();
+        enabled = false;
+        string nameIDs = Utils.getValueInName(transform.name, "Checkpoint.");
+        string firstID = nameIDs.Remove(3, nameIDs.Length - 3);
+        string secondID = Utils.getValueInName(nameIDs, "-a");
+
+        checkpointIDs = new List<int>();
+        if (firstID != "") checkpointIDs.Add(int.Parse(firstID));
+        if (secondID != "") checkpointIDs.Add(int.Parse(secondID));
+    }
+
+    public List<Transform> getOrigins()
+    {
+        List<Transform> origins = new List<Transform>();
         foreach (Transform child in transform)
         {
             if (child.name.Contains("Origin"))
             {
                 origins.Add(child);
-
-                Debug.Log(child.name + " forward: " + getRealForward(child));
             }
         }
-
-        enabled = false;
+        return origins;
     }
 
-    private Vector3 getRealForward(Transform childTransform)
+    void OnTriggerEnter(Collider collider)
     {
-        // Vector3 eulerRotation = childTransform.rotation.ToEuler();
-        // Debug.Log("EULER: " + eulerRotation);
-        // Transform identityTransform = new GameObject("aux").transform;
-
-        // identityTransform.RotateAroundLocal(Vector3.right, eulerRotation.x);
-        // identityTransform.RotateAroundLocal(Vector3.up, eulerRotation.y);
-        // identityTransform.RotateAroundLocal(Vector3.forward, eulerRotation.z);
-
-        // childTransform.transform.localRotation = identityTransform.localRotation;
-
-        // Destroy(identityTransform.gameObject);
-        return childTransform.forward;
+        if (collider.GetComponentInParent<RearWheelDrive>() is RearWheelDrive car)
+        {
+            LevelParser.instance.onCheckpointEnter(car, checkpointIDs);
+        }
     }
 }
