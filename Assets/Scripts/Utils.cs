@@ -48,4 +48,10 @@ public static class Utils
         }
         return findedNode;
     }
+
+    public static int SortByNameValue(Transform p1, Transform p2, string key)
+    {
+        return int.Parse(Utils.getValueInName(p1.name, key)).CompareTo(int.Parse(Utils.getValueInName(p2.name, key)));
+    }
+
 }
