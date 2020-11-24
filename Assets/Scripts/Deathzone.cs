@@ -25,7 +25,7 @@ public class Deathzone : MonoBehaviour
 
     void OnTriggerEnter(Collider collider)
     {
-        if (collider.GetComponentInParent<RearWheelDrive>() is RearWheelDrive car)
+        if (collider.GetComponentInParent<Car>() is Car car)
         {
             LevelParser.instance.onDeathzoneEnter(car, enableID, disableID);
         }

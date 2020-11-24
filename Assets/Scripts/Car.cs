@@ -9,30 +9,28 @@ using System.Collections;
 #pragma warning disable RCS1110
 #pragma warning disable RCS1163
 #pragma warning disable IDE0060
+#pragma warning disable IDE1006
+#pragma warning disable IDE0044
 
 public enum Direction
 {
     Up, Down, Left, Right, None
 }
 
-public class RearWheelDrive : MonoBehaviour
+public class Car : MonoBehaviour
 {
     private WheelCollider[] wheels;
+    private Rigidbody rb;
+    private Vector3 up;
+    private float controlVertical;
+    private float controlHorizontal;
 
     [SerializeField] private Vector2[] relationVelocityTorque;
     [SerializeField] private Vector2[] relationVelocityMaxAngle;
     [SerializeField] private Vector2[] relationVelocitySkidding;
 
-    private Rigidbody rb;
-    private Vector3 up;
-
-    [HideInInspector] public int carID;
+    [HideInInspector] public Driver driver;
     [HideInInspector] public int color;
-    [HideInInspector] public int lastCheckpoint;
-    [HideInInspector] public int laps;
-    [HideInInspector] public int racePosition;
-
-
 
     public void Awake()
     {
@@ -45,17 +43,20 @@ public class RearWheelDrive : MonoBehaviour
             Debug.LogError("No hay relación velocidad - angulo en el auto");
             Debug.Break();
         }
+    }
 
-        laps = 0;
-        lastCheckpoint = -1;
+    public void drive(float verticalControl, float horizontalControl)
+    {
+        controlHorizontal = horizontalControl;
+        controlVertical = verticalControl;
     }
 
     public void FixedUpdate()
     {
         float currentVelocity = rb.velocity.magnitude;
 
-        float angle = Utils.getInterpolatedValueInVectors(relationVelocityMaxAngle, currentVelocity) * Input.GetAxis("Horizontal");
-        float torque = Utils.getInterpolatedValueInVectors(relationVelocityTorque, currentVelocity) * Input.GetAxis("Vertical");
+        float angle = Utils.getInterpolatedValueInVectors(relationVelocityMaxAngle, currentVelocity) * controlHorizontal;
+        float torque = Utils.getInterpolatedValueInVectors(relationVelocityTorque, currentVelocity) * controlVertical;
 
         //skiddingAngle = -angle * Utils.getInterpolatedValueInVectors(relationVelocitySkidding, currentVelocity);
         //transform.RotateAround(transform.up, (skiddingAngle - lastSkiddingAngle) * Mathf.Deg2Rad);
@@ -82,7 +83,7 @@ public class RearWheelDrive : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        transform.RotateAround(up, Input.GetAxis("Vertical") * Input.GetAxis("Horizontal") * 0.02f);
+        transform.RotateAround(up, controlVertical * controlHorizontal * 0.02f);
         rb.angularVelocity = Vector3.zero;
     }
 

@@ -6,8 +6,7 @@ public class FollowCamera : MonoBehaviour
 {
     public float distanceXZ;
     public float distanceY;
-    [SerializeField]
-    private Transform followedObject;
+    public Transform followedObject;
 
     void Awake()
     {

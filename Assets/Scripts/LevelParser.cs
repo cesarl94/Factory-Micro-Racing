@@ -22,20 +22,44 @@ public struct Arrow
     }
 }
 
+[System.Serializable]
+public struct CarInfo
+{
+    public GameObject carPrefab;
+    public int color;
+    public bool isPlayer;
+}
+
+[System.Serializable]
+public struct Race
+{
+    public bool forward;
+    public int laps;
+    public CarInfo[] carsGrill;
+}
+
 public class LevelParser : MonoBehaviour
 {
     public static LevelParser instance;
-    private Arrow[] checkpointOrigins;
-    private Arrow[] startingPoints;
-    private Vector3[] trackPoints;
+    [HideInInspector] public Arrow[] checkpointOrigins;
+    [HideInInspector] public Arrow[] startingPoints;
+    [HideInInspector] public Vector3[] trackPoints;
+
+    [SerializeField] private Race raceInfo;
+
+    private Player player;
+    private List<IA> ias;
 
     void Awake()
     {
         LevelParser.instance = this;
         enabled = false;
 
+        Transform mapInfo = Utils.findNode(transform, "MapInfo");
+        Transform track = Utils.findNode(mapInfo, "Track");
+
         List<Transform> allCheckpointOriginsNodes = new List<Transform>();
-        Checkpoint[] checkpoints = GetComponentsInChildren<Checkpoint>();
+        Checkpoint[] checkpoints = track.GetComponentsInChildren<Checkpoint>();
         foreach (Checkpoint checkpoint in checkpoints)
         {
             List<Transform> originsNodes = checkpoint.getOrigins();
@@ -54,7 +78,7 @@ public class LevelParser : MonoBehaviour
             Destroy(originNode.gameObject);
         }
 
-        Transform startingPointsNode = Utils.findNode(transform, "StartingPoints");
+        Transform startingPointsNode = Utils.findNode(track, "StartingPoints");
         startingPoints = new Arrow[startingPointsNode.childCount];
         for (int i = 0; i < startingPointsNode.childCount; i++)
         {
@@ -63,24 +87,50 @@ public class LevelParser : MonoBehaviour
         }
         Destroy(startingPointsNode.gameObject);
 
-        Transform pointsNode = Utils.findNode(transform, "Points");
+        Transform pointsNode = Utils.findNode(track, "Points");
         trackPoints = new Vector3[pointsNode.childCount];
         for (int i = 0; i < trackPoints.Length; i++)
         {
             trackPoints[i] = pointsNode.GetChild(i).position;
         }
         Destroy(pointsNode.gameObject);
-    }
 
-    private void logArray(List<Transform> origins)
-    {
-        foreach (Transform origin in origins)
+        for (int i = 0; i < raceInfo.carsGrill.Length; i++)
         {
-            Debug.Log(origin.name);
+            CarInfo carInfo = raceInfo.carsGrill[i];
+            GameObject carGameObject = Instantiate(carInfo.carPrefab);
+            Car car = carGameObject.GetComponent<Car>();
+            if (carInfo.isPlayer)
+            {
+                player = carGameObject.AddComponent<Player>();
+                player.Initialize(car, i);
+            }
+            else
+            {
+                IA ia = carGameObject.AddComponent<IA>();
+                ia.Initialize(car, i);
+                ias.Add(ia);
+            }
+
         }
     }
 
-    public void onCheckpointEnter(RearWheelDrive car, List<int> checkpointIDs)
+    public Vector3 getDirectionTo(int nextPoint)
+    {
+        int previousID = nextPoint - 1;
+        if (previousID < 0)
+        {
+            previousID = trackPoints.Length - 1;
+        }
+
+        Vector3 previousPosition = trackPoints[previousID];
+        Vector3 nextPosition = trackPoints[nextPoint];
+
+        return (nextPosition - previousPosition).normalized;
+    }
+
+
+    public void onCheckpointEnter(Car car, List<int> checkpointIDs)
     {
         string checkPoints = checkpointIDs[0].ToString();
         for (int i = 1; i < checkpointIDs.Count; i++)
@@ -91,7 +141,7 @@ public class LevelParser : MonoBehaviour
         Debug.Log("The car " + car.name + " enter on Checkpoint(s) " + checkPoints);
     }
 
-    public void onDeathzoneEnter(RearWheelDrive car, int enableID, int disableID)
+    public void onDeathzoneEnter(Car car, int enableID, int disableID)
     {
         Debug.Log("The car " + car.name + " enter on deathzone. enableID " + enableID + " disableID " + disableID);
     }

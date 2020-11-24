@@ -91,6 +91,13 @@ MonoBehaviour:
   relationVelocitySkidding:
   - {x: 0, y: 0}
   - {x: 7, y: 0}
+  up: {x: 0, y: 0, z: 0}
+  driver: {fileID: 0}
+  carID: 0
+  color: 0
+  lastCheckpoint: 0
+  laps: 0
+  racePosition: 0
 --- !u!1 &5351994080863109282
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,7 +235,6 @@ GameObject:
   - component: {fileID: 5351994081031551140}
   - component: {fileID: 5351994081031551137}
   - component: {fileID: 5351994081031551139}
-  - component: {fileID: 6432887117049033990}
   m_Layer: 9
   m_Name: Car1Bodywork
   m_TagString: Untagged
@@ -325,18 +331,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 6711899174544372003, guid: c541809143f61b846b09c0e4110d8d6a, type: 3}
---- !u!114 &6432887117049033990
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5351994081031551142}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2046a0e3829f1024cbad477d1cfd8498, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5351994081188166059
 GameObject:
   m_ObjectHideFlags: 0
