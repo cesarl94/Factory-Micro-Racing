@@ -27,9 +27,6 @@ public class IA : Driver
         nextPoint = path[1];
         direction = (path[1] - path[0]).normalized;
         direction2D = new Vector2(direction.x, direction.z).normalized;
-
-        FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
-        followCamera.followedObject = transform;
     }
 
     void Update()
@@ -58,7 +55,7 @@ public class IA : Driver
 
         // car.drive(1 - Mathf.Abs(crossProduct) - 0.5f, crossProduct);
         Rigidbody rb = car.GetComponent<Rigidbody>();
-        rb.velocity = direction * queTanDerechoVoy * 10f;
+        rb.velocity = direction * queTanDerechoVoy * 5;
         car.transform.forward = direction;
     }
 

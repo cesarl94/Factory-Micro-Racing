@@ -8,7 +8,8 @@ public class Player : Driver
 {
     protected override void Ready()
     {
-        //follow camera
+        FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
+        followCamera.followedObject = transform;
     }
 
     void Update()

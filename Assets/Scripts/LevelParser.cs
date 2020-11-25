@@ -44,18 +44,28 @@ public class LevelParser : MonoBehaviour
     [HideInInspector] public Arrow[] checkpointOrigins;
     [HideInInspector] public Arrow[] startingPoints;
     [HideInInspector] public Vector3[] trackPoints;
+    [HideInInspector] public Player player;
 
     [SerializeField] private Race raceInfo;
 
-    private Player player;
-    private List<IA> ias;
+    private Driver[] drivers;
+    private Driver[] sortedDrivers;
 
     void Awake()
     {
         LevelParser.instance = this;
-        enabled = false;
 
         Transform mapInfo = Utils.findNode(transform, "MapInfo");
+        Transform colliders = Utils.findNode(mapInfo, "MapColliders");
+
+        foreach (Transform machineCollider in colliders)
+        {
+            if (machineCollider.name.Contains("Machine"))
+            {
+                machineCollider.name = machineCollider.name.Remove(0, 21);
+            }
+        }
+
         Transform track = Utils.findNode(mapInfo, "Track");
 
         List<Transform> allCheckpointOriginsNodes = new List<Transform>();
@@ -95,6 +105,8 @@ public class LevelParser : MonoBehaviour
         }
         Destroy(pointsNode.gameObject);
 
+        drivers = new Driver[raceInfo.carsGrill.Length];
+
         for (int i = 0; i < raceInfo.carsGrill.Length; i++)
         {
             CarInfo carInfo = raceInfo.carsGrill[i];
@@ -103,46 +115,140 @@ public class LevelParser : MonoBehaviour
             if (carInfo.isPlayer)
             {
                 player = carGameObject.AddComponent<Player>();
-                player.Initialize(car, i);
+                drivers[i] = player;
             }
             else
             {
-                IA ia = carGameObject.AddComponent<IA>();
-                ia.Initialize(car, i);
-                ias.Add(ia);
+                drivers[i] = carGameObject.AddComponent<IA>();
             }
+            drivers[i].Initialize(car, i);
 
         }
     }
 
-    public Vector3 getDirectionTo(int nextPoint)
+    void Update()
     {
-        int previousID = nextPoint - 1;
-        if (previousID < 0)
-        {
-            previousID = trackPoints.Length - 1;
-        }
-
-        Vector3 previousPosition = trackPoints[previousID];
-        Vector3 nextPosition = trackPoints[nextPoint];
-
-        return (nextPosition - previousPosition).normalized;
+        sortDrivers();
     }
 
+    private void sortDrivers()
+    {
+        SortedDictionary<int, SortedDictionary<int, List<Driver>>> carsByLapByCheckpoint = new SortedDictionary<int, SortedDictionary<int, List<Driver>>>();
+
+        for (int i = 0; i < drivers.Length; i++)
+        {
+            Driver driver = drivers[i];
+            if (!carsByLapByCheckpoint.ContainsKey(driver.laps))
+            {
+                carsByLapByCheckpoint.Add(driver.laps, new SortedDictionary<int, List<Driver>>());
+            }
+            SortedDictionary<int, List<Driver>> carsInSameLap = carsByLapByCheckpoint[driver.laps];
+            if (!carsInSameLap.ContainsKey(driver.lastCheckpoint))
+            {
+                carsInSameLap.Add(driver.lastCheckpoint, new List<Driver>());
+            }
+            List<Driver> carsInSameCheckpoint = carsInSameLap[driver.lastCheckpoint];
+            carsInSameCheckpoint.Add(driver);
+        }
+
+        List<Driver> sortedDriversAux = new List<Driver>();
+        foreach (KeyValuePair<int, SortedDictionary<int, List<Driver>>> byLap in carsByLapByCheckpoint)
+        {
+            foreach (KeyValuePair<int, List<Driver>> byCheckpoint in byLap.Value)
+            {
+                List<Driver> drivers = byCheckpoint.Value;
+                Vector3 nextPoint = checkpointOrigins[drivers[0].nextCheckpoint].position;
+                drivers.Sort((p1, p2) =>
+                {
+                    float sqrDistanceP1 = Vector3.SqrMagnitude(p1.transform.position - nextPoint);
+                    float sqrDistanceP2 = Vector3.SqrMagnitude(p2.transform.position - nextPoint);
+                    return sqrDistanceP1.CompareTo(sqrDistanceP2);
+                });
+
+                foreach (Driver driver in drivers)
+                {
+                    sortedDriversAux.Add(driver);
+                }
+            }
+        }
+
+        sortedDriversAux.Reverse();
+        sortedDrivers = sortedDriversAux.ToArray();
+
+        for (int i = 0; i < sortedDrivers.Length; i++)
+        {
+            sortedDrivers[i].racePosition = i + 1;
+        }
+    }
+
+    private Dictionary<int, List<Driver>> getCarsByLap()
+    {
+        Dictionary<int, List<Driver>> carsByLap = new Dictionary<int, List<Driver>>();
+
+        for (int i = 0; i < drivers.Length; i++)
+        {
+            Driver driver = drivers[i];
+            if (!carsByLap.ContainsKey(driver.laps))
+            {
+                carsByLap.Add(driver.laps, new List<Driver>());
+            }
+            List<Driver> carsInSameLap = carsByLap[driver.laps];
+            carsInSameLap.Add(driver);
+        }
+
+        return carsByLap;
+    }
 
     public void onCheckpointEnter(Car car, List<int> checkpointIDs)
     {
-        string checkPoints = checkpointIDs[0].ToString();
-        for (int i = 1; i < checkpointIDs.Count; i++)
-        {
-            checkPoints += ", " + checkpointIDs[i].ToString();
-        }
+        Driver driver = car.driver;
+        int nextDriverCheckpoint = driver.nextCheckpoint;
 
-        Debug.Log("The car " + car.name + " enter on Checkpoint(s) " + checkPoints);
+        if (checkpointIDs.Contains(nextDriverCheckpoint))
+        {
+            driver.lastCheckpoint = nextDriverCheckpoint;
+            if (nextDriverCheckpoint == 0)
+            {
+                driver.laps++;
+                if (driver.laps == raceInfo.laps - 1)
+                {
+                    if (driver.isPlayer) Debug.LogWarning("LAST LAP!");
+                }
+                else if (driver.laps == raceInfo.laps)
+                {
+                    if (driver.isPlayer) Debug.LogWarning("END RACE. WINNER ");
+                }
+                else
+                {
+                    if (driver.isPlayer) Debug.LogWarning((raceInfo.laps - driver.laps) + " LAPS LEFT");
+                }
+            }
+            else
+            {
+                if (driver.isPlayer) Debug.LogWarning("PASSED " + nextDriverCheckpoint + " CHECKPOINT");
+            }
+        }
+        else if (checkpointIDs.Contains(driver.lastCheckpoint))
+        {
+            if (driver.isPlayer) Debug.LogWarning("WRONG WAY!");
+        }
+        else
+        {
+            driver.Kill();
+        }
     }
 
     public void onDeathzoneEnter(Car car, int enableID, int disableID)
     {
-        Debug.Log("The car " + car.name + " enter on deathzone. enableID " + enableID + " disableID " + disableID);
+        Driver driver = car.driver;
+        if (driver.lastCheckpoint >= enableID && driver.lastCheckpoint < disableID)
+        {
+            Debug.LogError("KILL: lastCheckpoint: " + driver.lastCheckpoint + " enableID: " + enableID + " disableID " + disableID);
+            driver.Kill();
+        }
+        else
+        {
+            Debug.Log("ENTER ON SAFE DEATHZONE");
+        }
     }
 }

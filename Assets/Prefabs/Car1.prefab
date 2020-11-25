@@ -91,13 +91,8 @@ MonoBehaviour:
   relationVelocitySkidding:
   - {x: 0, y: 0}
   - {x: 7, y: 0}
-  up: {x: 0, y: 0, z: 0}
   driver: {fileID: 0}
-  carID: 0
   color: 0
-  lastCheckpoint: 0
-  laps: 0
-  racePosition: 0
 --- !u!1 &5351994080863109282
 GameObject:
   m_ObjectHideFlags: 0
@@ -282,7 +277,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1e03e18ecba82c44ba0d6f79660995c8, type: 2}
+  - {fileID: 2100000, guid: 180cd5bcf6d69654dac3ed46d94eca1b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -9,6 +9,28 @@ public class Driver : MonoBehaviour
     [HideInInspector] public int laps;
     [HideInInspector] public int racePosition;
 
+    public bool isPlayer
+    {
+        get
+        {
+            return this == LevelParser.instance.player;
+        }
+    }
+
+    public int nextCheckpoint
+    {
+        get
+        {
+            int nextDriverCheckpoint = lastCheckpoint + 1;
+            if (nextDriverCheckpoint >= LevelParser.instance.checkpointOrigins.Length)
+            {
+                return 0;
+            }
+
+            return nextDriverCheckpoint;
+        }
+    }
+
     protected int startingPos;
 
     public void Initialize(Car car, int startingPos)
@@ -39,7 +61,7 @@ public class Driver : MonoBehaviour
 
     public void Kill()
     {
-        Debug.Log("KILL");
+        Debug.LogError("KILL");
     }
 
 

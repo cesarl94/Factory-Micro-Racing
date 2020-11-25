@@ -25,6 +25,7 @@ public class Car : MonoBehaviour
     private float controlVertical;
     private float controlHorizontal;
 
+
     [SerializeField] private Vector2[] relationVelocityTorque;
     [SerializeField] private Vector2[] relationVelocityMaxAngle;
     [SerializeField] private Vector2[] relationVelocitySkidding;
@@ -79,6 +80,26 @@ public class Car : MonoBehaviour
         }
 
         up = rb.transform.up;
+        if (up.y < 0)
+        {
+            driver.Kill();
+        }
+
+        isTouchingConveyerBelt();
+    }
+
+    private void isTouchingConveyerBelt()
+    {
+        Vector3 origin = transform.position + up * 0.05f;
+        RaycastHit rch;
+        if (Physics.Raycast(origin, -up, out rch, 0.1f, 1 << LayerMask.NameToLayer("ConveyerBelt")))
+        {
+            string[] xyz = rch.collider.gameObject.name.Split(',');
+            Vector3 direction = new Vector3(float.Parse(xyz[0]), float.Parse(xyz[1]), float.Parse(xyz[2]));
+            //rb.velocity += direction * 0.1f;
+
+            // Debug.Log("Collision con " + rch.collider.gameObject.name);
+        }
     }
 
     void OnCollisionEnter(Collision collision)

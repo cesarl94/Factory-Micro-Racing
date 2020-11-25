@@ -12,6 +12,7 @@ using UnityEngine;
 public class Checkpoint : MonoBehaviour
 {
     private List<int> checkpointIDs;
+    private List<Car> insideCars;
 
     void Awake()
     {
@@ -23,6 +24,8 @@ public class Checkpoint : MonoBehaviour
         checkpointIDs = new List<int>();
         if (firstID != "") checkpointIDs.Add(int.Parse(firstID));
         if (secondID != "") checkpointIDs.Add(int.Parse(secondID));
+
+        insideCars = new List<Car>();
     }
 
     public List<Transform> getOrigins()
@@ -42,7 +45,19 @@ public class Checkpoint : MonoBehaviour
     {
         if (collider.GetComponentInParent<Car>() is Car car)
         {
-            LevelParser.instance.onCheckpointEnter(car, checkpointIDs);
+            if (!insideCars.Contains(car))
+            {
+                LevelParser.instance.onCheckpointEnter(car, checkpointIDs);
+            }
+            insideCars.Add(car);
+        }
+    }
+
+    void OnTriggerExit(Collider collider)
+    {
+        if (collider.GetComponentInParent<Car>() is Car car)
+        {
+            insideCars.Remove(car);
         }
     }
 }
