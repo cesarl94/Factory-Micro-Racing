@@ -47,10 +47,13 @@ public class LevelParser : MonoBehaviour
     [HideInInspector] public Player player;
 
     [SerializeField] private GameObject explosionPrefab;
+    public float respawnSeconds;
     [SerializeField] private Race raceInfo;
 
     private Driver[] drivers;
     private Driver[] sortedDrivers;
+    private List<Driver> indisposedDrivers;
+    private List<Explosion> explosions;
 
     void Awake()
     {
@@ -125,11 +128,29 @@ public class LevelParser : MonoBehaviour
             drivers[i].Initialize(car, i);
 
         }
+
+        explosions = new List<Explosion>();
+        indisposedDrivers = new List<Driver>();
     }
 
     void Update()
     {
         sortDrivers();
+
+        List<Driver> readyDrivers = new List<Driver>();
+        foreach (Driver indisposedDriver in indisposedDrivers)
+        {
+            if (Time.time - indisposedDriver.deathTime > respawnSeconds)
+            {
+                indisposedDriver.Respawn();
+                readyDrivers.Add(indisposedDriver);
+            }
+        }
+
+        foreach (Driver readyDriver in readyDrivers)
+        {
+            indisposedDrivers.Remove(readyDriver);
+        }
     }
 
     private void sortDrivers()
@@ -244,12 +265,37 @@ public class LevelParser : MonoBehaviour
         Driver driver = car.driver;
         if (driver.lastCheckpoint >= enableID && driver.lastCheckpoint < disableID)
         {
-            Debug.LogError("KILL: lastCheckpoint: " + driver.lastCheckpoint + " enableID: " + enableID + " disableID " + disableID);
             driver.Kill();
         }
-        else
+    }
+
+    public void ShowExplosion(Vector3 position, Driver driver)
+    {
+        if (indisposedDrivers.Contains(driver))
         {
-            Debug.Log("ENTER ON SAFE DEATHZONE");
+            return;
         }
+        Explosion freeExplosion = null;
+        foreach (Explosion explosion in explosions)
+        {
+            if (!explosion.isPlaying())
+            {
+                freeExplosion = explosion;
+                break;
+            }
+        }
+
+        if (freeExplosion == null)
+        {
+            GameObject explosionGameObject = Instantiate(explosionPrefab);
+            freeExplosion = explosionGameObject.GetComponent<Explosion>();
+            explosions.Add(freeExplosion);
+        }
+
+        freeExplosion.transform.position = position;
+        freeExplosion.Explode();
+
+        indisposedDrivers.Add(driver);
+
     }
 }

@@ -8,6 +8,7 @@ public class Driver : MonoBehaviour
     [HideInInspector] public int lastCheckpoint;
     [HideInInspector] public int laps;
     [HideInInspector] public int racePosition;
+    [HideInInspector] public float deathTime;
 
     public bool isPlayer
     {
@@ -48,23 +49,20 @@ public class Driver : MonoBehaviour
         lastCheckpoint = -1;
 
         Ready();
-
-
     }
 
-    protected virtual void Ready()
-    {
-        Debug.Log("READY DRIVER");
-    }
-
-
+    protected virtual void Ready() { }
 
     public void Kill()
     {
-        Debug.LogError("KILL");
+        deathTime = Time.time;
+        car.Explode();
     }
 
-
+    public void Respawn()
+    {
+        car.Respawn();
+    }
 
 
 }

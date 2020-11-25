@@ -44,6 +44,11 @@ public class Car : MonoBehaviour
             Debug.LogError("No hay relación velocidad - angulo en el auto");
             Debug.Break();
         }
+        if (relationVelocityTorque.Length == 0)
+        {
+            Debug.LogError("No hay relación velocidad - torque en el auto");
+            Debug.Break();
+        }
     }
 
     public void drive(float verticalControl, float horizontalControl)
@@ -97,9 +102,6 @@ public class Car : MonoBehaviour
             string[] xyz = rch.collider.gameObject.name.Split(',');
             Vector3 direction = new Vector3(float.Parse(xyz[0]), float.Parse(xyz[1]), float.Parse(xyz[2]));
             rb.transform.position += -direction * 0.03f;
-            //rb.velocity += direction * 0.1f;
-
-            // Debug.Log("Collision con " + rch.collider.gameObject.name);
         }
     }
 
@@ -112,5 +114,32 @@ public class Car : MonoBehaviour
     void OnCollisionStay(Collision collision)
     {
         OnCollisionEnter(collision);
+    }
+
+    public void Explode()
+    {
+        enabled = false;
+        rb.isKinematic = true;
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            r.enabled = false;
+        }
+        LevelParser.instance.ShowExplosion(transform.position, driver);
+    }
+
+    public void Respawn()
+    {
+        //gameObject.SetActive(true);
+        enabled = true;
+        rb.isKinematic = false;
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            r.enabled = true;
+        }
+        Arrow lastCheckpoint = LevelParser.instance.checkpointOrigins[driver.lastCheckpoint];
+        transform.position = lastCheckpoint.position;
+        transform.forward = lastCheckpoint.forward;
     }
 }

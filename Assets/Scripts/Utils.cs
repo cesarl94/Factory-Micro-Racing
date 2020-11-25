@@ -43,13 +43,7 @@ public static class Utils
 
     public static Transform findNode(Transform parent, string name)
     {
-        Transform findedNode = parent.Find(name);
-        if (findedNode == null)
-        {
-            Debug.LogError("Error: \"" + name + "\" node wasn't finded");
-            Debug.Break();
-        }
-        return findedNode;
+        return parent.Find(name);
     }
 
     public static int SortByNameValue(Transform p1, Transform p2, string key)
