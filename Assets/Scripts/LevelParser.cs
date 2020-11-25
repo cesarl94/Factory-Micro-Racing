@@ -46,6 +46,7 @@ public class LevelParser : MonoBehaviour
     [HideInInspector] public Vector3[] trackPoints;
     [HideInInspector] public Player player;
 
+    [SerializeField] private GameObject explosionPrefab;
     [SerializeField] private Race raceInfo;
 
     private Driver[] drivers;

@@ -3151,6 +3151,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackPoints: []
   player: {fileID: 0}
+  explosionPrefab: {fileID: 89365790281604734, guid: 5ec1b8afdf9b0684aa35903f45c6b04b,
+    type: 3}
   raceInfo:
     forward: 1
     laps: 3

@@ -96,6 +96,7 @@ public class Car : MonoBehaviour
         {
             string[] xyz = rch.collider.gameObject.name.Split(',');
             Vector3 direction = new Vector3(float.Parse(xyz[0]), float.Parse(xyz[1]), float.Parse(xyz[2]));
+            rb.transform.position += -direction * 0.03f;
             //rb.velocity += direction * 0.1f;
 
             // Debug.Log("Collision con " + rch.collider.gameObject.name);

@@ -9,6 +9,7 @@ public class ConveyerBelt : MonoBehaviour
     void Awake()
     {
         mat = GetComponent<Renderer>().material;
+        mat.SetFloat("_TimeScale", mat.GetFloat("_TimeScale") * -1f);
     }
 
     void Update()
