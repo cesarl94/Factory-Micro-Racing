@@ -131,7 +131,7 @@ public class LevelParser : MonoBehaviour
             {
                 drivers[i] = carGameObject.AddComponent<IA>();
             }
-            drivers[i].Initialize(car, i);
+            drivers[i].Initialize(car, i, carInfo.color);
         }
 
         sortedDrivers = drivers;

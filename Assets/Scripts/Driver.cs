@@ -34,7 +34,7 @@ public class Driver : MonoBehaviour
 
     protected int startingPos;
 
-    public void Initialize(Car car, int startingPos)
+    public void Initialize(Car car, int startingPos, int color)
     {
         this.car = car;
         this.startingPos = startingPos;
@@ -43,7 +43,7 @@ public class Driver : MonoBehaviour
         car.transform.forward = LevelParser.instance.startingPoints[startingPos].forward;
 
         car.driver = this;
-        car.color = 0;
+        car.setColor(color);
         laps = -1;
         racePosition = startingPos;
         lastCheckpoint = -1;

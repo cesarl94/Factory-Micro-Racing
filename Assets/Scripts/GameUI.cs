@@ -11,6 +11,7 @@ public class GameUI : MonoBehaviour
     TextMeshProUGUI laps;
     TextMeshProUGUI velocity;
     Image[] carSprites;
+    Color[] colors16;
 
     //Uso el Start y no el Awake porque necesito que el level parser ya se haya creado
     void Start()
@@ -34,6 +35,12 @@ public class GameUI : MonoBehaviour
         laps = lapsNode.GetComponent<TextMeshProUGUI>();
         Transform velocityNode = Utils.findNode(transform, "Velocity");
         velocity = velocityNode.GetComponent<TextMeshProUGUI>();
+
+        colors16 = new Color[16];
+        for (int i = 0; i < 16; i++)
+        {
+            colors16[i] = carTexture.GetPixel(i, 14) + new Color(0.1f, 0.1f, 0.1f);
+        }
     }
 
     void Update()
@@ -45,7 +52,7 @@ public class GameUI : MonoBehaviour
         {
             Driver driver = sortedDrivers[i];
             positionsText += "     " + (i + 1).ToString() + ") " + driver.name + "\n";
-            carSprites[i].color = carTexture.GetPixel(driver.car.color, 14) + new Color(0.1f, 0.1f, 0.1f);
+            carSprites[i].color = colors16[driver.car.color];
 
         }
 

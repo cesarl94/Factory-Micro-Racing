@@ -3167,7 +3167,7 @@ MonoBehaviour:
     - name: Player
       carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
         type: 3}
-      color: 0
+      color: 2
       isPlayer: 1
 --- !u!64 &7307898916109258654
 MeshCollider:

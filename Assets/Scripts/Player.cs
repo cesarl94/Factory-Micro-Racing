@@ -10,6 +10,7 @@ public class Player : Driver
     {
         FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
         followCamera.followedObject = transform;
+        restoreFollowCamera();
     }
 
     void Update()
@@ -20,5 +21,13 @@ public class Player : Driver
         }
 
         car.drive(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
+    }
+
+    public void restoreFollowCamera()
+    {
+        FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
+        followCamera.transform.position = transform.position;
+        followCamera.transform.position -= transform.forward * followCamera.distanceXZ;
+        followCamera.transform.position += transform.up * followCamera.distanceY;
     }
 }

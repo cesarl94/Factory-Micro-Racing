@@ -42,11 +42,11 @@ public static class Utils
     }
 
 
-    public static Transform findNode(Transform parent, string name)
+    public static Transform findNode(Transform parent, string name, bool exactly = true)
     {
         foreach (Transform child in parent)
         {
-            if (child.name == name)
+            if ((exactly && child.name == name) || (!exactly && child.name.Contains(name)))
             {
                 return child;
             }

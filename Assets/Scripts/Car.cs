@@ -59,6 +59,14 @@ public class Car : MonoBehaviour
         }
     }
 
+    public void setColor(int color)
+    {
+        this.color = color;
+        Transform bodywork = Utils.findNode(transform, "Bodywork", false);
+        Material mat = bodywork.GetComponent<Renderer>().material;
+        mat.SetFloat("_CarColor", color);
+    }
+
     public void drive(float verticalControl, float horizontalControl)
     {
         controlHorizontal = horizontalControl;
@@ -141,7 +149,6 @@ public class Car : MonoBehaviour
 
     public void Respawn()
     {
-        //gameObject.SetActive(true);
         enabled = true;
         rb.isKinematic = false;
         foreach (Renderer r in GetComponentsInChildren<Renderer>())
@@ -151,5 +158,10 @@ public class Car : MonoBehaviour
         Arrow lastCheckpoint = LevelParser.instance.checkpointOrigins[driver.lastCheckpoint];
         transform.position = lastCheckpoint.position;
         transform.forward = lastCheckpoint.forward;
+
+        if (driver.isPlayer)
+        {
+            LevelParser.instance.player.restoreFollowCamera();
+        }
     }
 }
