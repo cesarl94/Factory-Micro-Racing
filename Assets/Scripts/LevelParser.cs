@@ -12,13 +12,30 @@ using UnityEngine;
 
 public struct Arrow
 {
-    public Vector3 position;
+    public Vector3 origin;
     public Vector3 forward;
+    public float magnitude;
+
+    public Vector3 destiny
+    {
+        get
+        {
+            return origin + forward * magnitude;
+        }
+    }
 
     public Arrow(Vector3 position, Vector3 forward)
     {
-        this.position = position;
+        this.origin = position;
         this.forward = forward;
+        magnitude = 1;
+    }
+
+    public Arrow(Vector3 position, Vector3 forward, float magnitude)
+    {
+        this.origin = position;
+        this.forward = forward;
+        this.magnitude = magnitude;
     }
 }
 
@@ -109,6 +126,7 @@ public class LevelParser : MonoBehaviour
         {
             trackPoints[i] = pointsNode.GetChild(i).position;
         }
+
         Destroy(pointsNode.gameObject);
 
         GameObject carsContainerGameObject = new GameObject("CarsContainer");
@@ -226,7 +244,7 @@ public class LevelParser : MonoBehaviour
             foreach (KeyValuePair<int, List<Driver>> byCheckpoint in byLap.Value)
             {
                 List<Driver> drivers = byCheckpoint.Value;
-                Vector3 nextPoint = checkpointOrigins[drivers[0].nextCheckpoint].position;
+                Vector3 nextPoint = checkpointOrigins[drivers[0].nextCheckpoint].origin;
                 drivers.Sort((p1, p2) =>
                 {
                     float sqrDistanceP1 = Vector3.SqrMagnitude(p1.transform.position - nextPoint);
@@ -276,6 +294,7 @@ public class LevelParser : MonoBehaviour
         if (checkpointIDs.Contains(nextDriverCheckpoint))
         {
             driver.lastCheckpoint = nextDriverCheckpoint;
+
             if (nextDriverCheckpoint == 0)
             {
                 driver.laps++;

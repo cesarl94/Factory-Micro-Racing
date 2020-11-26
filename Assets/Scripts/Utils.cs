@@ -79,47 +79,96 @@ public static class Utils
         return Vector3.Lerp(lerp1, lerp2, t);
     }
 
-    public static Vector3[] getSmoothedTrackPath(Vector3[] trackPoints, float cornerBezierFactor = 0.5f, float handleBezierFactor = 1.15f)
+    public static Vector3[] getSmoothedCorner(Vector3 a, Vector3 b, Vector3 c, float cornerBezierFactor = 0.5f, float handleBezierFactor = 1.15f)
     {
-        Vector3[] path = new Vector3[(trackPoints.Length - 2) * 11 + 2];
-        path[0] = trackPoints[0];
+        Vector3[] rv = new Vector3[11];
+        rv[0] = a;
 
-        for (int i = 1; i < trackPoints.Length - 1; i++)
-        {
-            Vector3 currentPoint = trackPoints[i];
-            Vector3 previousPoint = trackPoints[i - 1];
-            Vector3 nextPoint = trackPoints[i + 1];
+        Vector3 initBezierPoint = Vector3.Lerp(b, a, cornerBezierFactor);
+        Vector3 endBezierPoint = Vector3.Lerp(b, c, cornerBezierFactor);
+        Vector3 initHandle = Vector3.Lerp(initBezierPoint, b, handleBezierFactor);
+        Vector3 endHandle = Vector3.Lerp(endBezierPoint, b, handleBezierFactor);
 
-            Vector3 initBezierPoint = Vector3.Lerp(previousPoint, currentPoint, cornerBezierFactor);
-            Vector3 endBezierPoint = Vector3.Lerp(nextPoint, currentPoint, cornerBezierFactor);
-            Vector3 initHandle = Vector3.Lerp(initBezierPoint, currentPoint, handleBezierFactor);
-            Vector3 endHandle = Vector3.Lerp(endBezierPoint, currentPoint, handleBezierFactor);
+        for (int i = 0; i < 10; i++)
+            rv[i] = Utils.getBezierPoint(initBezierPoint, initHandle, endHandle, endBezierPoint, (float)i / 9f);
 
-            for (int j = 0; j < 11; j++)
-            {
-                float t = (float)j / 10f;
-                Vector3 bezierPoint = Utils.getBezierPoint(initBezierPoint, initHandle, endHandle, endBezierPoint, t);
-                path[(i - 1) * 11 + j + 1] = bezierPoint;
-            }
-        }
-        path[path.Length - 1] = trackPoints[0];
+        return rv;
+    }
 
-        List<Vector3> pathWithoutDoublePoints = new List<Vector3>();
-        pathWithoutDoublePoints.Add(path[0]);
-        for (int i = 1; i < path.Length; i++)
-        {
-            Vector3 previousPoint = path[i - 1];
-            Vector3 currentPoint = path[i];
+    // public static Vector3[] getSmoothedTrackPath(Vector3[] trackPoints, float cornerBezierFactor = 0.5f, float handleBezierFactor = 1.15f)
+    // {
+    //     Vector3[] path = new Vector3[(trackPoints.Length - 2) * 10 + 1];
+    //     path[0] = trackPoints[0];
 
-            if (!currentPoint.Equals(previousPoint))
-            {
-                pathWithoutDoublePoints.Add(currentPoint);
+    //     for (int i = 1; i < trackPoints.Length - 1; i++)
+    //     {
+    //         Vector3 currentPoint = trackPoints[i];
+    //         Vector3 previousPoint = trackPoints[i - 1];
+    //         Vector3 nextPoint = trackPoints[i + 1];
 
-            }
+    //         Vector3 initBezierPoint = Vector3.Lerp(previousPoint, currentPoint, cornerBezierFactor);
+    //         Vector3 endBezierPoint = Vector3.Lerp(nextPoint, currentPoint, cornerBezierFactor);
+    //         Vector3 initHandle = Vector3.Lerp(initBezierPoint, currentPoint, handleBezierFactor);
+    //         Vector3 endHandle = Vector3.Lerp(endBezierPoint, currentPoint, handleBezierFactor);
 
-        }
+    //         for (int j = 0; j < 10; j++)
+    //         {
+    //             float t = (float)(j + 1) / 10f;
+    //             Vector3 bezierPoint = Utils.getBezierPoint(initBezierPoint, initHandle, endHandle, endBezierPoint, t);
+    //             path[(i - 1) * 10 + j + 1] = bezierPoint;
+    //         }
+    //     }
+    //     path[path.Length - 1] = trackPoints[0];
 
-        return pathWithoutDoublePoints.ToArray();
+    //     List<Vector3> pathWithoutDoublePoints = new List<Vector3>();
+    //     pathWithoutDoublePoints.Add(path[0]);
+    //     for (int i = 1; i < path.Length; i++)
+    //     {
+    //         Vector3 previousPoint = path[i - 1];
+    //         Vector3 currentPoint = path[i];
+
+    //         if (!currentPoint.Equals(previousPoint))
+    //         {
+    //             pathWithoutDoublePoints.Add(currentPoint);
+
+    //         }
+    //         else
+    //         {
+    //             Debug.Log("EVITADOS DOS PUNTOS IGUALES");
+    //         }
+
+    //     }
+
+    //     return pathWithoutDoublePoints.ToArray();
+    // }
+
+    public static Vector3 getMin(Vector3 a, Vector3 b)
+    {
+        return new Vector3(Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y), Mathf.Min(a.z, b.z));
+    }
+
+    public static Vector3 getMax(Vector3 a, Vector3 b)
+    {
+        return new Vector3(Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y), Mathf.Max(a.z, b.z));
+    }
+
+    public static Vector3 clamp(Vector3 min, Vector3 max, Vector3 value)
+    {
+        float x = value.x < min.x ? min.x : (value.x > max.x ? max.x : value.x);
+        float y = value.y < min.y ? min.y : (value.y > max.y ? max.y : value.y);
+        float z = value.z < min.z ? min.z : (value.z > max.z ? max.z : value.z);
+        return new Vector3(x, y, z);
+    }
+
+    public static Vector3 closestPointToLine(Vector3 P0, Vector3 P1, Vector3 point)
+    {
+        Vector3 u = P1 - P0;
+        Vector3 pq = point - P0;
+        Vector3 w2 = pq - (u * Vector3.Dot(pq, u) / Vector3.SqrMagnitude(u));
+        Vector3 rv = point - w2;
+        Vector3 min = getMin(P0, P1);
+        Vector3 max = getMax(P0, P1);
+        return clamp(min, max, rv);
     }
 
 }

@@ -48,6 +48,19 @@ public class PauseMenu : MonoBehaviour
 
     public void activate(bool state)
     {
+        if (!enabled && gameUI.gameObject.active)
+        {
+            //Es el ready set go
+            Debug.Log("HOLA");
+            return;
+        }
+        if (gameTitle != null)
+        {
+            //Es el menu principal
+            playGame();
+            return;
+        }
+
         enabled = state;
         pauseText.enabled = state;
         background.enabled = state;
@@ -75,7 +88,10 @@ public class PauseMenu : MonoBehaviour
             float buttonScale = 1.70f + (Mathf.Sin(Time.realtimeSinceStartup * 3f) + 0.5f) * 0.1f;
             playButton.localScale = new Vector3(buttonScale, buttonScale, 1);
 
-
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                playGame();
+            }
         }
         else if (Time.realtimeSinceStartup - lastTimeChecked > textSwitchTime)
         {
@@ -119,6 +135,8 @@ public class PauseMenu : MonoBehaviour
         pauseText.text = "GO!";
         yield return StartCoroutine(CoroutineUtil.WaitForRealSeconds(0.75f));
         pauseText.text = "PAUSE";
+        //Lo ponemos en true e inmediatamente despues lo seteamos a falso, para que no crea que seguimos en el readySetGo
+        enabled = true;
         activate(false);
     }
 }

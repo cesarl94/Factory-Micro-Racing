@@ -18,6 +18,7 @@ public class FollowCamera : MonoBehaviour
 
     void Update()
     {
+        if (followedObject == null) return;
         Vector3 toObject = followedObject.position - transform.position;
         Vector2 toObjectXZ = new Vector2(toObject.x, toObject.z).normalized;
 

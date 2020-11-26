@@ -21,8 +21,8 @@ public class GameUI : MonoBehaviour
         positions = positionsNode.GetComponent<TextMeshProUGUI>();
         Transform carSpriteNode = Utils.findNode(positionsNode, "CarSprite");
         carSpritesList.Add(carSpriteNode.GetComponent<Image>());
-        Driver[] drivers = LevelParser.instance.sortedDrivers;
-        int duplicateCount = drivers.Length - 1;
+        int driversCount = LevelParser.instance.raceInfo.carsGrill.Length;
+        int duplicateCount = driversCount - 1;
         for (int i = 0; i < duplicateCount; i++)
         {
             Transform newCarSpriteNode = Instantiate(carSpriteNode.gameObject, carSpriteNode.parent).transform;

@@ -156,7 +156,7 @@ public class Car : MonoBehaviour
             r.enabled = true;
         }
         Arrow lastCheckpoint = LevelParser.instance.checkpointOrigins[driver.lastCheckpoint];
-        transform.position = lastCheckpoint.position;
+        transform.position = lastCheckpoint.origin;
         transform.forward = lastCheckpoint.forward;
 
         if (driver.isPlayer)

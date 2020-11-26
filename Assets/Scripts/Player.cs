@@ -9,7 +9,7 @@ public class Player : Driver
     protected override void Ready()
     {
         FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
-        followCamera.followedObject = transform;
+        //followCamera.followedObject = transform;
         restoreFollowCamera();
     }
 

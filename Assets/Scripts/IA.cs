@@ -4,67 +4,142 @@ using UnityEngine;
 
 public class IA : Driver
 {
-    protected Vector3[] path;
+    private Arrow[] path;
     private int nextPointID;
-    private Vector3 direction;
-    private Vector2 direction2D;
-    private Vector3 nextPoint;
 
     protected override void Ready()
     {
-        Vector3[] trackPoints = LevelParser.instance.trackPoints;
-        Vector3[] allTrackPoints = new Vector3[trackPoints.Length + 2];
-        allTrackPoints[0] = LevelParser.instance.startingPoints[startingPos].position;
-        for (int i = 0; i < trackPoints.Length; i++)
-        {
-            allTrackPoints[i + 1] = trackPoints[i];
-        }
-        allTrackPoints[trackPoints.Length + 1] = trackPoints[0];
+        nextPointID = 0;
+        tracePath();
 
-        path = Utils.getSmoothedTrackPath(allTrackPoints, 0.8f);
-
-        nextPointID = 1;
-        nextPoint = path[1];
-        direction = (path[1] - path[0]).normalized;
-        direction2D = new Vector2(direction.x, direction.z).normalized;
+        FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
+        followCamera.followedObject = transform;
     }
 
     void Update()
     {
+        float aditionalDistance = 0.4f * car.velocity;
+        float traveledDistance = getTraveledDistanceToClosestPoint(transform.position);
+        Arrow? traveledPoint = getTraveledPointInPath(traveledDistance + aditionalDistance);
 
-        bool pointPassed = Vector3.Dot(nextPoint - transform.position, direction) < 0;
-        while (pointPassed)
+        while (!traveledPoint.HasValue)
         {
-            Vector3 previousPoint = nextPoint;
-            nextPointID++;
-            if (nextPointID >= path.Length)
-            {
-                nextPointID = 0;
-            }
-            nextPoint = path[nextPointID];
-            direction = (nextPoint - previousPoint).normalized;
-            direction2D = new Vector2(direction.x, direction.z).normalized;
-            pointPassed = Vector3.Dot(nextPoint - transform.position, direction) < 0;
+            nextPointID = (nextPointID + 1) % LevelParser.instance.trackPoints.Length;
+            tracePath();
+            traveledDistance = getTraveledDistanceToClosestPoint(transform.position);
+            traveledPoint = getTraveledPointInPath(traveledDistance + aditionalDistance);
         }
 
-        float queTanDerechoVoy = Vector3.Dot(transform.forward, direction);
-        //if (queTanDerechoVoy < 0.1f) queTanDerechoVoy = 0.1f;
+        Arrow simulatedPoint = traveledPoint.Value;
+
+        float queTanDerechoVoy = Vector3.Dot(transform.forward, simulatedPoint.forward);
+        if (queTanDerechoVoy < 0.1f) queTanDerechoVoy = 0.1f;
+
+        Vector2 forward2D = new Vector2(transform.forward.x, transform.forward.z).normalized;
+        Vector2 toSimulatedPoint2D = new Vector2(simulatedPoint.origin.x - transform.position.x, simulatedPoint.origin.z - transform.position.z).normalized;
+
+        //Vector2 forward2D = new Vector2(transform.forward.x, transform.forward.z).normalized;
+        float crossProduct = Utils.CrossProduct(toSimulatedPoint2D, forward2D);
+
+        car.drive(/*1 - Mathf.Abs(crossProduct) - 0.5f*/ queTanDerechoVoy, crossProduct);
+
+        // Arrow elPuntoMasCercanoAlPathQueEstoy = getFirstClosestPointOnPath(transform.position, queTanAdelanteDeboIr);
+
+
+        // puntoMasCercano.transform.position = elPuntoMasCercanoAlPathQueEstoy.origin;
+        // puntoMasCercano.transform.forward = elPuntoMasCercanoAlPathQueEstoy.forward;
+
+        // float caminoRecorrido = 0f;
+        // for (int i = 0; i < pathArrow.Length; i++)
+        // {
+        //     if (pathArrow[i].forward.Equals(elPuntoMasCercanoAlPathQueEstoy))
+        //     {
+        //         caminoRecorrido += Vector3.Distance(elPuntoMasCercanoAlPathQueEstoy.origin, pathArrow[i].position);
+        //     }
+        //     else
+        //     {
+        //         caminoRecorrido += pathArrow[i].magnitude;
+        //     }
+        // }
+
+        // float caminoPorRecorrer = caminoRecorrido + queTanAdelanteDeboIr;
+        // Arrow puntoAdelantado = getTraveledPointInPath(caminoPorRecorrer);
+        // puntoAdelantadoGO.transform.position = puntoAdelantado.origin;
+        // puntoAdelantadoGO.transform.forward = puntoAdelantado.forward;
+
+        // float queTanDerechoVoy = Vector3.Dot(transform.forward, puntoAdelantado.forward);
+        // if (queTanDerechoVoy < 0.1f) queTanDerechoVoy = 0.1f;
 
         // Vector2 forward2D = new Vector2(transform.forward.x, transform.forward.z).normalized;
         // float crossProduct = Utils.CrossProduct(direction2D, forward2D);
 
         // car.drive(1 - Mathf.Abs(crossProduct) - 0.5f, crossProduct);
-        Rigidbody rb = car.GetComponent<Rigidbody>();
-        rb.velocity = direction * queTanDerechoVoy * 5;
-        car.transform.forward = direction;
+
+
+    }
+
+    private Arrow? getTraveledPointInPath(float distance)
+    {
+        float traveledDistance = 0f;
+        for (int i = 0; i < path.Length; i++)
+        {
+            if (distance - traveledDistance > path[i].magnitude)
+            {
+                traveledDistance += path[i].magnitude;
+            }
+            else
+            {
+                return new Arrow(path[i].origin + path[i].forward * (distance - traveledDistance), path[i].forward);
+            }
+        }
+        return null;
+    }
+
+
+
+    private float getTraveledDistanceToClosestPoint(Vector3 position)
+    {
+        float closestSqrDistance = float.PositiveInfinity;
+        float lastSqrDistanceToOrigin = 0;
+        float traveledDistance = 0;
+
+        for (int i = 0; i < path.Length; i++)
+        {
+            Arrow currentArrow = path[i];
+            Vector3 closestPoint = Utils.closestPointToLine(currentArrow.origin, currentArrow.destiny, position);
+            float sqrDistance = Vector3.SqrMagnitude(closestPoint - position);
+            if (sqrDistance < closestSqrDistance)
+            {
+                if (i > 0) traveledDistance += path[i - 1].magnitude;
+                closestSqrDistance = sqrDistance;
+                lastSqrDistanceToOrigin = Vector3.SqrMagnitude(closestPoint - currentArrow.origin);
+            }
+            else return traveledDistance + Mathf.Sqrt(lastSqrDistanceToOrigin);
+        }
+
+        return traveledDistance + path[path.Length - 1].magnitude;
+    }
+
+    public void tracePath()
+    {
+        Vector3[] trackPoints = LevelParser.instance.trackPoints;
+        Vector3[] smoothedCorner = Utils.getSmoothedCorner(transform.position, trackPoints[nextPointID], trackPoints[(nextPointID + 1) % trackPoints.Length]);
+
+        path = new Arrow[10];
+        for (int i = 0; i < 10; i++)
+        {
+            Vector3 difference = smoothedCorner[i + 1] - smoothedCorner[i];
+            float magnitude = difference.magnitude;
+            path[i] = new Arrow(smoothedCorner[i], difference / magnitude, magnitude);
+        }
     }
 
     void OnDrawGizmos()
     {
         for (int i = 1; i < path.Length; i++)
         {
-            Vector3 previous = path[i - 1];
-            Vector3 current = path[i];
+            Vector3 previous = path[i - 1].origin;
+            Vector3 current = path[i].origin;
             Debug.DrawLine(previous, current, Color.yellow);
         }
     }

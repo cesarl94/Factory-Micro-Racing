@@ -42,7 +42,7 @@
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
             //SHADER SIN IFS :)
-            float smaller = 1 - step(0.9375, IN.uv_MainTex.y);
+            float smaller = 1.0 - step(0.9375, IN.uv_MainTex.y);
             float greather = step(0.875, IN.uv_MainTex.y);
             float isInLine = smaller * greather;
             IN.uv_MainTex.x = isInLine * (0.03125 + _CarColor * 0.0625) + (1.0 - isInLine) * IN.uv_MainTex.x;

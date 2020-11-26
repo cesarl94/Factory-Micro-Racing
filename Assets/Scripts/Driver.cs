@@ -22,24 +22,23 @@ public class Driver : MonoBehaviour
     {
         get
         {
-            int nextDriverCheckpoint = lastCheckpoint + 1;
-            if (nextDriverCheckpoint >= LevelParser.instance.checkpointOrigins.Length)
-            {
-                return 0;
-            }
-
-            return nextDriverCheckpoint;
+            return getNextPoint();
         }
     }
 
     protected int startingPos;
+
+    public int getNextPoint(int addition = 1)
+    {
+        return (lastCheckpoint + addition) % LevelParser.instance.checkpointOrigins.Length;
+    }
 
     public void Initialize(Car car, int startingPos, int color)
     {
         this.car = car;
         this.startingPos = startingPos;
 
-        car.transform.position = LevelParser.instance.startingPoints[startingPos].position;
+        car.transform.position = LevelParser.instance.startingPoints[startingPos].origin;
         car.transform.forward = LevelParser.instance.startingPoints[startingPos].forward;
 
         car.driver = this;
