@@ -42,40 +42,6 @@ public class IA : Driver
         float crossProduct = Utils.CrossProduct(toSimulatedPoint2D, forward2D);
 
         car.drive(/*1 - Mathf.Abs(crossProduct) - 0.5f*/ queTanDerechoVoy, crossProduct);
-
-        // Arrow elPuntoMasCercanoAlPathQueEstoy = getFirstClosestPointOnPath(transform.position, queTanAdelanteDeboIr);
-
-
-        // puntoMasCercano.transform.position = elPuntoMasCercanoAlPathQueEstoy.origin;
-        // puntoMasCercano.transform.forward = elPuntoMasCercanoAlPathQueEstoy.forward;
-
-        // float caminoRecorrido = 0f;
-        // for (int i = 0; i < pathArrow.Length; i++)
-        // {
-        //     if (pathArrow[i].forward.Equals(elPuntoMasCercanoAlPathQueEstoy))
-        //     {
-        //         caminoRecorrido += Vector3.Distance(elPuntoMasCercanoAlPathQueEstoy.origin, pathArrow[i].position);
-        //     }
-        //     else
-        //     {
-        //         caminoRecorrido += pathArrow[i].magnitude;
-        //     }
-        // }
-
-        // float caminoPorRecorrer = caminoRecorrido + queTanAdelanteDeboIr;
-        // Arrow puntoAdelantado = getTraveledPointInPath(caminoPorRecorrer);
-        // puntoAdelantadoGO.transform.position = puntoAdelantado.origin;
-        // puntoAdelantadoGO.transform.forward = puntoAdelantado.forward;
-
-        // float queTanDerechoVoy = Vector3.Dot(transform.forward, puntoAdelantado.forward);
-        // if (queTanDerechoVoy < 0.1f) queTanDerechoVoy = 0.1f;
-
-        // Vector2 forward2D = new Vector2(transform.forward.x, transform.forward.z).normalized;
-        // float crossProduct = Utils.CrossProduct(direction2D, forward2D);
-
-        // car.drive(1 - Mathf.Abs(crossProduct) - 0.5f, crossProduct);
-
-
     }
 
     private Arrow? getTraveledPointInPath(float distance)
