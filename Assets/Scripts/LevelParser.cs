@@ -115,6 +115,9 @@ public class LevelParser : MonoBehaviour
         carsContainer = carsContainerGameObject.transform;
 
         drivers = new Driver[raceInfo.carsGrill.Length];
+        explosions = new List<Explosion>();
+        indisposedDrivers = new List<Driver>();
+
 
         for (int i = 0; i < raceInfo.carsGrill.Length; i++)
         {
@@ -135,14 +138,46 @@ public class LevelParser : MonoBehaviour
         }
 
         sortedDrivers = drivers;
-
-        explosions = new List<Explosion>();
-        indisposedDrivers = new List<Driver>();
     }
 
     public void resetGame()
     {
-        Debug.Log("RESET GAME");
+        foreach (Transform car in carsContainer)
+        {
+            Destroy(car.gameObject);
+        }
+        foreach (Explosion explosion in explosions)
+        {
+            Destroy(explosion.gameObject);
+        }
+        explosions = new List<Explosion>();
+        indisposedDrivers = new List<Driver>();
+
+
+        for (int i = 0; i < raceInfo.carsGrill.Length; i++)
+        {
+            CarInfo carInfo = raceInfo.carsGrill[i];
+            GameObject carGameObject = Instantiate(carInfo.carPrefab, carsContainer);
+            carGameObject.name = carInfo.name;
+            Car car = carGameObject.GetComponent<Car>();
+            if (carInfo.isPlayer)
+            {
+                player = carGameObject.AddComponent<Player>();
+                drivers[i] = player;
+            }
+            else
+            {
+                drivers[i] = carGameObject.AddComponent<IA>();
+            }
+            drivers[i].Initialize(car, i, carInfo.color);
+        }
+        sortedDrivers = drivers;
+
+        Transform boxesNode = Utils.findNode(transform, "Boxes");
+        foreach (ReseteableObject ro in boxesNode.GetComponentsInChildren<ReseteableObject>())
+        {
+            ro.reset();
+        }
     }
 
     void Update()

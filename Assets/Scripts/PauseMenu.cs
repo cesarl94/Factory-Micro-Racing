@@ -86,17 +86,39 @@ public class PauseMenu : MonoBehaviour
 
     public void reset()
     {
-        LevelParser.instance.resetGame();
-        activate(false);
+
+        StartCoroutine(readySetGo());
     }
 
     public void playGame()
     {
-        LevelParser.instance.resetGame();
         Destroy(gameTitle.gameObject);
         gameTitle = null;
         Destroy(playButton.gameObject);
         playButton = null;
+        StartCoroutine(readySetGo());
+    }
+
+    private IEnumerator readySetGo()
+    {
+        LevelParser.instance.resetGame();
+        activate(true);
+        enabled = false;
+        foreach (Button button in GetComponentsInChildren<Button>(true))
+        {
+            button.gameObject.SetActive(false);
+        }
+
+        gameUI.gameObject.SetActive(true);
+
+
+        pauseText.text = "Ready?";
+        yield return StartCoroutine(CoroutineUtil.WaitForRealSeconds(0.75f));
+        pauseText.text = "Set";
+        yield return StartCoroutine(CoroutineUtil.WaitForRealSeconds(0.75f));
+        pauseText.text = "GO!";
+        yield return StartCoroutine(CoroutineUtil.WaitForRealSeconds(0.75f));
+        pauseText.text = "PAUSE";
         activate(false);
     }
 }
