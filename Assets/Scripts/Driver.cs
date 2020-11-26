@@ -39,8 +39,8 @@ public class Driver : MonoBehaviour
         this.car = car;
         this.startingPos = startingPos;
 
-        this.car.transform.position = LevelParser.instance.startingPoints[startingPos].position;
-        this.car.transform.forward = LevelParser.instance.startingPoints[startingPos].forward;
+        car.transform.position = LevelParser.instance.startingPoints[startingPos].position;
+        car.transform.forward = LevelParser.instance.startingPoints[startingPos].forward;
 
         car.driver = this;
         car.color = 0;

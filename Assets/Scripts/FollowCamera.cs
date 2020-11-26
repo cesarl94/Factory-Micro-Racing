@@ -10,20 +10,20 @@ public class FollowCamera : MonoBehaviour
 
     void Awake()
     {
-        if (this.followedObject == null)
+        if (followedObject == null)
         {
-            this.enabled = false;
+            enabled = false;
         }
     }
 
     void Update()
     {
-        Vector3 toObject = (this.followedObject.position - this.transform.position);
+        Vector3 toObject = followedObject.position - transform.position;
         Vector2 toObjectXZ = new Vector2(toObject.x, toObject.z).normalized;
 
-        Vector3 desiredPosition = this.followedObject.position - new Vector3(toObjectXZ.x, 0, toObjectXZ.y) * this.distanceXZ + Vector3.up * this.distanceY;
-        this.transform.position = Vector3.Lerp(this.transform.position, desiredPosition, 0.05f);
-        this.transform.rotation = Quaternion.LookRotation(toObject);
+        Vector3 desiredPosition = followedObject.position - new Vector3(toObjectXZ.x, 0, toObjectXZ.y) * distanceXZ + Vector3.up * distanceY;
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, 0.05f * Time.deltaTime * 60f);
+        transform.rotation = Quaternion.LookRotation(toObject);
 
 
     }

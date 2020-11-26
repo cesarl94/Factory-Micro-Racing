@@ -3151,6 +3151,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackPoints: []
   player: {fileID: 0}
+  sortedDrivers: []
   explosionPrefab: {fileID: 89365790281604734, guid: 5ec1b8afdf9b0684aa35903f45c6b04b,
     type: 3}
   respawnSeconds: 3
@@ -3158,11 +3159,13 @@ MonoBehaviour:
     forward: 1
     laps: 3
     carsGrill:
-    - carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
+    - name: Juan Carlos
+      carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
         type: 3}
       color: 0
       isPlayer: 0
-    - carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
+    - name: Player
+      carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
         type: 3}
       color: 0
       isPlayer: 1

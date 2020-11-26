@@ -14,6 +14,11 @@ public class Player : Driver
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Return))
+        {
+            PauseMenu.instance.activate(!PauseMenu.instance.getState());
+        }
+
         car.drive(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
     }
 }

@@ -25,6 +25,7 @@ public struct Arrow
 [System.Serializable]
 public struct CarInfo
 {
+    public string name;
     public GameObject carPrefab;
     public int color;
     public bool isPlayer;
@@ -45,15 +46,16 @@ public class LevelParser : MonoBehaviour
     [HideInInspector] public Arrow[] startingPoints;
     [HideInInspector] public Vector3[] trackPoints;
     [HideInInspector] public Player player;
+    [HideInInspector] public Driver[] sortedDrivers;
 
     [SerializeField] private GameObject explosionPrefab;
     public float respawnSeconds;
-    [SerializeField] private Race raceInfo;
+    public Race raceInfo;
 
     private Driver[] drivers;
-    private Driver[] sortedDrivers;
     private List<Driver> indisposedDrivers;
     private List<Explosion> explosions;
+    private Transform carsContainer;
 
     void Awake()
     {
@@ -109,12 +111,16 @@ public class LevelParser : MonoBehaviour
         }
         Destroy(pointsNode.gameObject);
 
+        GameObject carsContainerGameObject = new GameObject("CarsContainer");
+        carsContainer = carsContainerGameObject.transform;
+
         drivers = new Driver[raceInfo.carsGrill.Length];
 
         for (int i = 0; i < raceInfo.carsGrill.Length; i++)
         {
             CarInfo carInfo = raceInfo.carsGrill[i];
-            GameObject carGameObject = Instantiate(carInfo.carPrefab);
+            GameObject carGameObject = Instantiate(carInfo.carPrefab, carsContainer);
+            carGameObject.name = carInfo.name;
             Car car = carGameObject.GetComponent<Car>();
             if (carInfo.isPlayer)
             {
@@ -126,11 +132,17 @@ public class LevelParser : MonoBehaviour
                 drivers[i] = carGameObject.AddComponent<IA>();
             }
             drivers[i].Initialize(car, i);
-
         }
+
+        sortedDrivers = drivers;
 
         explosions = new List<Explosion>();
         indisposedDrivers = new List<Driver>();
+    }
+
+    public void resetGame()
+    {
+        Debug.Log("RESET GAME");
     }
 
     void Update()
@@ -184,7 +196,7 @@ public class LevelParser : MonoBehaviour
                 {
                     float sqrDistanceP1 = Vector3.SqrMagnitude(p1.transform.position - nextPoint);
                     float sqrDistanceP2 = Vector3.SqrMagnitude(p2.transform.position - nextPoint);
-                    return sqrDistanceP1.CompareTo(sqrDistanceP2);
+                    return sqrDistanceP2.CompareTo(sqrDistanceP1);
                 });
 
                 foreach (Driver driver in drivers)

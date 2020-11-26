@@ -33,6 +33,14 @@ public class Car : MonoBehaviour
     [HideInInspector] public Driver driver;
     [HideInInspector] public int color;
 
+    public float velocity
+    {
+        get
+        {
+            return rb.velocity.magnitude;
+        }
+    }
+
     public void Awake()
     {
         wheels = GetComponentsInChildren<WheelCollider>();
@@ -95,6 +103,7 @@ public class Car : MonoBehaviour
 
     private void isTouchingConveyerBelt()
     {
+        if (PauseMenu.instance.getState()) return;
         Vector3 origin = transform.position + up * 0.05f;
         RaycastHit rch;
         if (Physics.Raycast(origin, -up, out rch, 0.1f, 1 << LayerMask.NameToLayer("ConveyerBelt")))
@@ -107,6 +116,7 @@ public class Car : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        if (PauseMenu.instance.getState()) return;
         transform.RotateAround(up, controlVertical * controlHorizontal * 0.02f);
         rb.angularVelocity = Vector3.zero;
     }

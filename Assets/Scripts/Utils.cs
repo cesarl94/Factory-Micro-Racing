@@ -41,9 +41,25 @@ public static class Utils
         return inputOutput[inputOutput.Length - 1].y;
     }
 
+
     public static Transform findNode(Transform parent, string name)
     {
-        return parent.Find(name);
+        foreach (Transform child in parent)
+        {
+            if (child.name == name)
+            {
+                return child;
+            }
+            else
+            {
+                Transform found = findNode(child, name);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     public static int SortByNameValue(Transform p1, Transform p2, string key)
