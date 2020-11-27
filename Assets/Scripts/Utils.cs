@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-#pragma warning disable IDE1006
-#pragma warning disable IDE0028
-
 public static class Utils
 {
     public static string getValueInName(string source, string key)

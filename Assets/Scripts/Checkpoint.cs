@@ -2,13 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-#pragma warning disable RCS1222
-#pragma warning disable IDE1006
-#pragma warning disable RCS1018
-#pragma warning disable RCS1213
-#pragma warning disable RCS1110
-#pragma warning disable IDE0051
-
 public class Checkpoint : MonoBehaviour
 {
     private List<int> checkpointIDs;

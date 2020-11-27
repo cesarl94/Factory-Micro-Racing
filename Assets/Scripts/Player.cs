@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-#pragma warning disable IDE0051
-
 public class Player : Driver
 {
     protected override void Ready()
