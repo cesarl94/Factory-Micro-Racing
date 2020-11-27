@@ -7,6 +7,9 @@ public class FollowCamera : MonoBehaviour
     public float distanceXZ;
     public float distanceY;
     public Transform followedObject;
+    private AudioSource musicIntro;
+    private AudioSource musicLoop;
+
 
     void Awake()
     {
@@ -14,10 +17,20 @@ public class FollowCamera : MonoBehaviour
         {
             enabled = false;
         }
+
+        AudioSource[] sources = GetComponents<AudioSource>();
+        musicIntro = sources[0];
+        musicLoop = sources[1];
+        musicIntro.Play();
     }
 
     void Update()
     {
+        if (!musicIntro.isPlaying && !musicLoop.isPlaying)
+        {
+            musicLoop.Play();
+        }
+
         if (followedObject == null) return;
         Vector3 toObject = followedObject.position - transform.position;
         Vector2 toObjectXZ = new Vector2(toObject.x, toObject.z).normalized;

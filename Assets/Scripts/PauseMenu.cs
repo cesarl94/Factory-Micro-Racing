@@ -13,10 +13,18 @@ public class PauseMenu : MonoBehaviour
     private float lastTimeChecked;
     private GameUI gameUI;
 
+    private Transform credits;
+    private Transform continueButton;
+
     private RectTransform gameTitle;
     private RectTransform playButton;
-    private float gameTitleOriginalScale;
-    private float gameTitleOriginalRotation;
+
+    private AudioSource playSound;
+
+    private TextMeshProUGUI lastLap;
+    private float lastLapTimer;
+    private TextMeshProUGUI youWin;
+    private TextMeshProUGUI youLose;
 
     void Awake()
     {
@@ -37,8 +45,46 @@ public class PauseMenu : MonoBehaviour
 
         playButton = Utils.findNode(transform, "PlayButton").GetComponent<RectTransform>(); ;
         gameTitle = Utils.findNode(transform, "GameTitle").GetComponent<RectTransform>(); ;
-        gameTitleOriginalScale = gameTitle.localScale.x;
-        gameTitleOriginalRotation = gameTitle.localRotation.z;
+
+        playSound = GetComponent<AudioSource>();
+
+        lastLap = Utils.findNode(transform, "LastLap").GetComponent<TextMeshProUGUI>();
+        youWin = Utils.findNode(transform, "Win").GetComponent<TextMeshProUGUI>();
+        youLose = Utils.findNode(transform, "Lost").GetComponent<TextMeshProUGUI>();
+        credits = Utils.findNode(transform, "Credits");
+        continueButton = Utils.findNode(transform, "ContinueButton");
+    }
+
+    public void showLastLap()
+    {
+        StartCoroutine(lastLapCoroutine());
+    }
+
+    private IEnumerator lastLapCoroutine()
+    {
+        lastLap.enabled = true;
+        yield return StartCoroutine(CoroutineUtil.WaitForRealSeconds(1));
+        lastLap.enabled = false;
+    }
+
+    public void endRace(bool win)
+    {
+        activate(true);
+        continueButton.gameObject.SetActive(false);
+        pauseText.enabled = false;
+        if (win)
+        {
+            youWin.enabled = true;
+        }
+        else
+        {
+            youLose.enabled = true;
+        }
+
+        foreach (Driver driver in LevelParser.instance.sortedDrivers)
+        {
+            driver.car.engine.Stop();
+        }
     }
 
     public bool getState()
@@ -48,10 +94,14 @@ public class PauseMenu : MonoBehaviour
 
     public void activate(bool state)
     {
-        if (!enabled && gameUI.gameObject.active)
+        if (!state && (youWin.enabled || youLose.enabled))
+        {
+            //Queremos quitar la pausa cuando la partida terminó
+            return;
+        }
+        if (!enabled && pauseText.text != "PAUSE")
         {
             //Es el ready set go
-            Debug.Log("HOLA");
             return;
         }
         if (gameTitle != null)
@@ -64,6 +114,7 @@ public class PauseMenu : MonoBehaviour
         enabled = state;
         pauseText.enabled = state;
         background.enabled = state;
+        credits.gameObject.SetActive(state);
 
         foreach (Button button in GetComponentsInChildren<Button>(true))
         {
@@ -75,6 +126,8 @@ public class PauseMenu : MonoBehaviour
         lastTimeChecked = Time.realtimeSinceStartup;
         Time.timeScale = state ? 0 : 1;
     }
+
+
 
     void Update()
     {
@@ -93,7 +146,7 @@ public class PauseMenu : MonoBehaviour
                 playGame();
             }
         }
-        else if (Time.realtimeSinceStartup - lastTimeChecked > textSwitchTime)
+        else if (Time.realtimeSinceStartup - lastTimeChecked > textSwitchTime && !youWin.enabled && !youLose.enabled)
         {
             pauseText.enabled = !pauseText.enabled;
             lastTimeChecked += textSwitchTime;
@@ -118,6 +171,10 @@ public class PauseMenu : MonoBehaviour
     private IEnumerator readySetGo()
     {
         LevelParser.instance.resetGame();
+        playSound.Play();
+        lastLap.enabled = false;
+        youWin.enabled = false;
+        youLose.enabled = false;
         activate(true);
         enabled = false;
         foreach (Button button in GetComponentsInChildren<Button>(true))

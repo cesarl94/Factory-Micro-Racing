@@ -9,18 +9,19 @@ public class Player : Driver
     protected override void Ready()
     {
         FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
-        //followCamera.followedObject = transform;
+        followCamera.followedObject = transform;
         restoreFollowCamera();
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Return))
-        {
             PauseMenu.instance.activate(!PauseMenu.instance.getState());
-        }
 
         car.drive(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal"));
+
+        if (car.enabled && Input.GetKeyDown(KeyCode.Space)) car.honk.Play();
+        if (Input.GetKeyUp(KeyCode.Space)) car.honk.Stop();
     }
 
     public void restoreFollowCamera()

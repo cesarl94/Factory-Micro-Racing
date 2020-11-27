@@ -32,6 +32,9 @@ public class Car : MonoBehaviour
 
     [HideInInspector] public Driver driver;
     [HideInInspector] public int color;
+    [HideInInspector] public AudioSource engine;
+    [HideInInspector] public AudioSource honk;
+    [HideInInspector] public AudioSource crash;
 
     public float velocity
     {
@@ -47,6 +50,12 @@ public class Car : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = Vector3.zero;
 
+        AudioSource[] sources = GetComponents<AudioSource>();
+        engine = sources[0];
+        honk = sources[1];
+        crash = sources[2];
+
+
         if (relationVelocityMaxAngle.Length == 0)
         {
             Debug.LogError("No hay relación velocidad - angulo en el auto");
@@ -56,6 +65,15 @@ public class Car : MonoBehaviour
         {
             Debug.LogError("No hay relación velocidad - torque en el auto");
             Debug.Break();
+        }
+    }
+
+    public void setDriver(Driver driver)
+    {
+        this.driver = driver;
+        if (!driver.isPlayer)
+        {
+            engine.volume = 0.1f;
         }
     }
 
@@ -69,6 +87,7 @@ public class Car : MonoBehaviour
 
     public void drive(float verticalControl, float horizontalControl)
     {
+        engine.pitch = 0.5f + verticalControl * 0.75f;
         controlHorizontal = horizontalControl;
         controlVertical = verticalControl;
     }
@@ -125,17 +144,21 @@ public class Car : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         if (PauseMenu.instance.getState()) return;
+        crash.Play();
         transform.RotateAround(up, controlVertical * controlHorizontal * 0.02f);
         rb.angularVelocity = Vector3.zero;
     }
 
     void OnCollisionStay(Collision collision)
     {
-        OnCollisionEnter(collision);
+        if (PauseMenu.instance.getState()) return;
+        transform.RotateAround(up, controlVertical * controlHorizontal * 0.02f);
+        rb.angularVelocity = Vector3.zero;
     }
 
     public void Explode()
     {
+        engine.Stop();
         enabled = false;
         rb.isKinematic = true;
         rb.velocity = Vector3.zero;
@@ -149,13 +172,14 @@ public class Car : MonoBehaviour
 
     public void Respawn()
     {
+        engine.Play();
         enabled = true;
         rb.isKinematic = false;
         foreach (Renderer r in GetComponentsInChildren<Renderer>())
         {
             r.enabled = true;
         }
-        Arrow lastCheckpoint = LevelParser.instance.checkpointOrigins[driver.lastCheckpoint];
+        Arrow lastCheckpoint = driver.lastCheckpoint != -1 ? LevelParser.instance.checkpointOrigins[driver.lastCheckpoint] : LevelParser.instance.startingPoints[driver.startingPos];
         transform.position = lastCheckpoint.origin;
         transform.forward = lastCheckpoint.forward;
 

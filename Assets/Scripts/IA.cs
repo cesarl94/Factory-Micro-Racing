@@ -13,7 +13,7 @@ public class IA : Driver
         tracePath();
 
         FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
-        followCamera.followedObject = transform;
+        //followCamera.followedObject = transform;
     }
 
     void Update()

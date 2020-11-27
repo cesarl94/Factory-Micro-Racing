@@ -9,6 +9,7 @@ public class Driver : MonoBehaviour
     [HideInInspector] public int laps;
     [HideInInspector] public int racePosition;
     [HideInInspector] public float deathTime;
+    [HideInInspector] public int startingPos;
 
     public bool isPlayer
     {
@@ -26,7 +27,6 @@ public class Driver : MonoBehaviour
         }
     }
 
-    protected int startingPos;
 
     public int getNextPoint(int addition = 1)
     {
@@ -41,7 +41,7 @@ public class Driver : MonoBehaviour
         car.transform.position = LevelParser.instance.startingPoints[startingPos].origin;
         car.transform.forward = LevelParser.instance.startingPoints[startingPos].forward;
 
-        car.driver = this;
+        car.setDriver(this);
         car.setColor(color);
         laps = -1;
         racePosition = startingPos;

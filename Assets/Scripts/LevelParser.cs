@@ -172,6 +172,7 @@ public class LevelParser : MonoBehaviour
         indisposedDrivers = new List<Driver>();
 
 
+
         for (int i = 0; i < raceInfo.carsGrill.Length; i++)
         {
             CarInfo carInfo = raceInfo.carsGrill[i];
@@ -188,6 +189,7 @@ public class LevelParser : MonoBehaviour
                 drivers[i] = carGameObject.AddComponent<IA>();
             }
             drivers[i].Initialize(car, i, carInfo.color);
+            car.engine.Play();
         }
         sortedDrivers = drivers;
 
@@ -300,27 +302,18 @@ public class LevelParser : MonoBehaviour
                 driver.laps++;
                 if (driver.laps == raceInfo.laps - 1)
                 {
-                    if (driver.isPlayer) Debug.LogWarning("LAST LAP!");
+                    if (driver.isPlayer)
+                    {
+                        PauseMenu.instance.showLastLap();
+                    }
                 }
                 else if (driver.laps == raceInfo.laps)
                 {
-                    if (driver.isPlayer) Debug.LogWarning("END RACE. WINNER ");
-                }
-                else
-                {
-                    if (driver.isPlayer) Debug.LogWarning((raceInfo.laps - driver.laps) + " LAPS LEFT");
+                    PauseMenu.instance.endRace(driver.isPlayer);
                 }
             }
-            else
-            {
-                if (driver.isPlayer) Debug.LogWarning("PASSED " + nextDriverCheckpoint + " CHECKPOINT");
-            }
         }
-        else if (checkpointIDs.Contains(driver.lastCheckpoint))
-        {
-            if (driver.isPlayer) Debug.LogWarning("WRONG WAY!");
-        }
-        else
+        else if (!checkpointIDs.Contains(driver.lastCheckpoint))
         {
             driver.Kill();
         }
