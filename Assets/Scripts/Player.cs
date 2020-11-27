@@ -6,8 +6,9 @@ public class Player : Driver
 {
     protected override void Ready()
     {
-        FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
+        FollowCamera followCamera = FollowCamera.instance.GetComponent<FollowCamera>();
         followCamera.followedObject = transform;
+        followCamera.enabled = true;
         restoreFollowCamera();
     }
 
@@ -24,7 +25,7 @@ public class Player : Driver
 
     public void restoreFollowCamera()
     {
-        FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
+        FollowCamera followCamera = FollowCamera.instance.GetComponent<FollowCamera>();
         followCamera.transform.position = transform.position;
         followCamera.transform.position -= transform.forward * followCamera.distanceXZ;
         followCamera.transform.position += transform.up * followCamera.distanceY;

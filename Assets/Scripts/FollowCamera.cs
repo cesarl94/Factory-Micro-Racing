@@ -10,9 +10,12 @@ public class FollowCamera : MonoBehaviour
     private AudioSource musicIntro;
     private AudioSource musicLoop;
 
+    public static FollowCamera instance;
+
 
     void Awake()
     {
+        FollowCamera.instance = this;
         if (followedObject == null)
         {
             enabled = false;
