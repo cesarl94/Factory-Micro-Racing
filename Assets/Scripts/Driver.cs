@@ -51,6 +51,7 @@ public class Driver : MonoBehaviour
     }
 
     protected virtual void Ready() { }
+    protected virtual void Resp() { }
 
     public void Kill()
     {
@@ -61,6 +62,7 @@ public class Driver : MonoBehaviour
     public void Respawn()
     {
         car.Respawn();
+        Resp();
     }
 
 

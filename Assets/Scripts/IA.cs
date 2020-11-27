@@ -11,9 +11,11 @@ public class IA : Driver
     {
         nextPointID = 0;
         tracePath();
+    }
 
-        FollowCamera followCamera = Camera.main.GetComponent<FollowCamera>();
-        //followCamera.followedObject = transform;
+    protected override void Resp()
+    {
+        tracePath();
     }
 
     void Update()
@@ -31,17 +33,12 @@ public class IA : Driver
         }
 
         Arrow simulatedPoint = traveledPoint.Value;
-
-        float queTanDerechoVoy = Vector3.Dot(transform.forward, simulatedPoint.forward);
-        if (queTanDerechoVoy < 0.1f) queTanDerechoVoy = 0.1f;
-
         Vector2 forward2D = new Vector2(transform.forward.x, transform.forward.z).normalized;
         Vector2 toSimulatedPoint2D = new Vector2(simulatedPoint.origin.x - transform.position.x, simulatedPoint.origin.z - transform.position.z).normalized;
 
-        //Vector2 forward2D = new Vector2(transform.forward.x, transform.forward.z).normalized;
         float crossProduct = Utils.CrossProduct(toSimulatedPoint2D, forward2D);
+        car.drive(Mathf.Max(0.1f, 1.5f - Mathf.Abs(crossProduct * 1.25f)), crossProduct);
 
-        car.drive(/*1 - Mathf.Abs(crossProduct) - 0.5f*/ queTanDerechoVoy, crossProduct);
     }
 
     private Arrow? getTraveledPointInPath(float distance)
@@ -89,7 +86,11 @@ public class IA : Driver
     public void tracePath()
     {
         Vector3[] trackPoints = LevelParser.instance.trackPoints;
-        Vector3[] smoothedCorner = Utils.getSmoothedCorner(transform.position, trackPoints[nextPointID], trackPoints[(nextPointID + 1) % trackPoints.Length]);
+        Vector3 a = transform.position;
+        Vector3 b = trackPoints[nextPointID];
+        Vector3 c = trackPoints[(nextPointID + 1) % trackPoints.Length];
+
+        Vector3[] smoothedCorner = Utils.getSmoothedCorner(addRandom(a, 0.01f), addRandom(b, 0.01f), addRandom(c, 0.01f), 0.2f, 1.2f);
 
         path = new Arrow[10];
         for (int i = 0; i < 10; i++)
@@ -98,6 +99,12 @@ public class IA : Driver
             float magnitude = difference.magnitude;
             path[i] = new Arrow(smoothedCorner[i], difference / magnitude, magnitude);
         }
+    }
+
+    Vector3 addRandom(Vector3 origin, float distance)
+    {
+        Vector2 point = new Vector2(Random.Range(-Mathf.PI, Mathf.PI), Random.Range(-Mathf.PI, Mathf.PI)).normalized * Random.Range(0, distance);
+        return origin + new Vector3(point.x, 0, point.y);
     }
 
     void OnDrawGizmos()

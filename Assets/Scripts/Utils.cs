@@ -62,11 +62,6 @@ public static class Utils
         return null;
     }
 
-    public static int SortByNameValue(Transform p1, Transform p2, string key)
-    {
-        return int.Parse(Utils.getValueInName(p1.name, key)).CompareTo(int.Parse(Utils.getValueInName(p2.name, key)));
-    }
-
     public static float CrossProduct(Vector2 a, Vector2 b)
     {
         return a.x * b.y - a.y * b.x;
@@ -90,57 +85,10 @@ public static class Utils
         Vector3 endHandle = Vector3.Lerp(endBezierPoint, b, handleBezierFactor);
 
         for (int i = 0; i < 10; i++)
-            rv[i] = Utils.getBezierPoint(initBezierPoint, initHandle, endHandle, endBezierPoint, (float)i / 9f);
+            rv[i + 1] = Utils.getBezierPoint(initBezierPoint, initHandle, endHandle, endBezierPoint, (float)i / 9f);
 
         return rv;
     }
-
-    // public static Vector3[] getSmoothedTrackPath(Vector3[] trackPoints, float cornerBezierFactor = 0.5f, float handleBezierFactor = 1.15f)
-    // {
-    //     Vector3[] path = new Vector3[(trackPoints.Length - 2) * 10 + 1];
-    //     path[0] = trackPoints[0];
-
-    //     for (int i = 1; i < trackPoints.Length - 1; i++)
-    //     {
-    //         Vector3 currentPoint = trackPoints[i];
-    //         Vector3 previousPoint = trackPoints[i - 1];
-    //         Vector3 nextPoint = trackPoints[i + 1];
-
-    //         Vector3 initBezierPoint = Vector3.Lerp(previousPoint, currentPoint, cornerBezierFactor);
-    //         Vector3 endBezierPoint = Vector3.Lerp(nextPoint, currentPoint, cornerBezierFactor);
-    //         Vector3 initHandle = Vector3.Lerp(initBezierPoint, currentPoint, handleBezierFactor);
-    //         Vector3 endHandle = Vector3.Lerp(endBezierPoint, currentPoint, handleBezierFactor);
-
-    //         for (int j = 0; j < 10; j++)
-    //         {
-    //             float t = (float)(j + 1) / 10f;
-    //             Vector3 bezierPoint = Utils.getBezierPoint(initBezierPoint, initHandle, endHandle, endBezierPoint, t);
-    //             path[(i - 1) * 10 + j + 1] = bezierPoint;
-    //         }
-    //     }
-    //     path[path.Length - 1] = trackPoints[0];
-
-    //     List<Vector3> pathWithoutDoublePoints = new List<Vector3>();
-    //     pathWithoutDoublePoints.Add(path[0]);
-    //     for (int i = 1; i < path.Length; i++)
-    //     {
-    //         Vector3 previousPoint = path[i - 1];
-    //         Vector3 currentPoint = path[i];
-
-    //         if (!currentPoint.Equals(previousPoint))
-    //         {
-    //             pathWithoutDoublePoints.Add(currentPoint);
-
-    //         }
-    //         else
-    //         {
-    //             Debug.Log("EVITADOS DOS PUNTOS IGUALES");
-    //         }
-
-    //     }
-
-    //     return pathWithoutDoublePoints.ToArray();
-    // }
 
     public static Vector3 getMin(Vector3 a, Vector3 b)
     {
@@ -173,6 +121,7 @@ public static class Utils
 
 }
 
+//Esta clase nos ayuda a crear una coroutina con el Time.scale en 0 (muy útil para el menú de pausa). (Gracias StackOverflow)
 public static class CoroutineUtil
 {
     public static IEnumerator WaitForRealSeconds(float time)

@@ -3383,12 +3383,32 @@ MonoBehaviour:
     - name: Juan Carlos
       carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
         type: 3}
-      color: 0
+      color: 1
+      isPlayer: 0
+    - name: Samuel
+      carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
+        type: 3}
+      color: 6
+      isPlayer: 0
+    - name: Pedro
+      carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
+        type: 3}
+      color: 3
+      isPlayer: 0
+    - name: Jose
+      carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
+        type: 3}
+      color: 4
+      isPlayer: 0
+    - name: Miguel
+      carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
+        type: 3}
+      color: 5
       isPlayer: 0
     - name: Player
       carPrefab: {fileID: 5351994080796746396, guid: 2754880c36df1c043ba6701b454fd0ba,
         type: 3}
-      color: 2
+      color: 0
       isPlayer: 1
 --- !u!64 &7307898916109258654
 MeshCollider:
@@ -5736,6 +5756,21 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: -2620898906308972933, guid: f451beeb0844faf479eda7155be0c5ad,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.147
+      objectReference: {fileID: 0}
+    - target: {fileID: -2620898906308972933, guid: f451beeb0844faf479eda7155be0c5ad,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0446
+      objectReference: {fileID: 0}
+    - target: {fileID: -2620898906308972933, guid: f451beeb0844faf479eda7155be0c5ad,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.0292
+      objectReference: {fileID: 0}
     - target: {fileID: -474017093064907410, guid: f451beeb0844faf479eda7155be0c5ad,
         type: 3}
       propertyPath: m_Layer
@@ -5775,6 +5810,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2573450337471121513, guid: f451beeb0844faf479eda7155be0c5ad,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 17.107971
+      objectReference: {fileID: 0}
+    - target: {fileID: 2573450337471121513, guid: f451beeb0844faf479eda7155be0c5ad,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.156
       objectReference: {fileID: 0}
     - target: {fileID: 2845508139390015197, guid: f451beeb0844faf479eda7155be0c5ad,
         type: 3}
